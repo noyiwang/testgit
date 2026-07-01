@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深入理解 Go 语言并发模型 - 码上行</title>
+    <style id="theme-vars">
+/* ============================================
+   码上行 (MaxHang) Brand Design Tokens
+   Warm Humanistic Tech — Cream, Amber, Serif
+   ============================================ */
+:root {
+  --background: #FDF8F0;
+  --foreground: #1C1917;
+  --card: #FFFFFF;
+  --card-foreground: #1C1917;
+  --primary: #B45309;
+  --primary-foreground: #FFFBEB;
+  --secondary: #F5F0E8;
+  --secondary-foreground: #44403C;
+  --muted: #F5F0E8;
+  --muted-foreground: #78716C;
+  --accent: #D97706;
+  --accent-foreground: #FFFBEB;
+  --border: #E7DFD3;
+  --input: #E7DFD3;
+  --ring: #B45309;
+  --brand-code-bg: #292524;
+  --brand-code-text: #FEF3C7;
+  --brand-code-keyword: #FCD34D;
+  --brand-code-string: #86EFAC;
+  --brand-code-comment: #A8A29E;
+  --brand-code-type: #93C5FD;
+  --brand-code-number: #FDA4AF;
+  --brand-serif: 'Georgia', 'Noto Serif SC', 'STSong', serif;
+  --brand-sans: 'Inter', 'Noto Sans SC', 'PingFang SC', system-ui, sans-serif;
+  --brand-mono: 'JetBrains Mono', 'Fira Code', 'Noto Sans Mono', monospace;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --radius-sm: var(--radius-sm);
+    --radius-md: var(--radius-md);
+    --radius-lg: var(--radius-lg);
+    --radius-xl: var(--radius-xl);
+  }
+
+  @layer base {
+    body { background: var(--background); color: var(--foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+
+  @layer components {
+    /* Drop cap first letter */
+    .drop-cap::first-letter {
+      float: left;
+      font-family: var(--brand-serif);
+      font-size: 4.5rem;
+      font-weight: 700;
+      line-height: 0.75;
+      padding-right: 0.6rem;
+      padding-top: 0.35rem;
+      color: var(--primary);
+    }
+
+    /* Code block styling */
+    .article-code {
+      background: var(--brand-code-bg);
+      color: var(--brand-code-text);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      overflow-x: auto;
+      font-family: var(--brand-mono);
+      font-size: 0.875rem;
+      line-height: 1.7;
+      tab-size: 4;
+    }
+    .article-code .kw { color: var(--brand-code-keyword); font-weight: 600; }
+    .article-code .str { color: var(--brand-code-string); }
+    .article-code .cmt { color: var(--brand-code-comment); font-style: italic; }
+    .article-code .typ { color: var(--brand-code-type); }
+    .article-code .num { color: var(--brand-code-number); }
+    .article-code .fn { color: #FDE68A; }
+
+    /* Inline code */
+    .article-inline-code {
+      background: var(--secondary);
+      color: var(--primary);
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      font-family: var(--brand-mono);
+      font-size: 0.875em;
+    }
+
+    /* Blockquote */
+    .article-blockquote {
+      border-left: 4px solid var(--accent);
+      padding: 1rem 1.5rem;
+      margin: 1.5rem 0;
+      background: var(--secondary);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      color: var(--secondary-foreground);
+      font-style: italic;
+    }
+
+    /* TOC active link */
+    .toc-link {
+      color: var(--muted-foreground);
+      transition: color 0.2s, border-color 0.2s;
+      border-left: 2px solid transparent;
+      padding-left: 0.75rem;
+    }
+    .toc-link:hover,
+    .toc-link.active {
+      color: var(--primary);
+      border-left-color: var(--accent);
+    }
+
+    /* Figure placeholder */
+    .figure-placeholder {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--secondary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+      color: var(--muted-foreground);
+    }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main>
+
+      <!-- ========== TOP NAVIGATION ========== -->
+      <nav class="w-full border-b" style="border-color: var(--border); background: var(--background);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex items-center justify-between h-16">
+            <!-- Brand -->
+            <a href="../pages/index.html" class="flex items-center gap-2 shrink-0" data-dom-id="nav-index">
+              <span class="text-xl font-bold" style="font-family: var(--brand-serif); color: var(--primary);">码上行</span>
+              <span class="hidden sm:inline text-xs" style="color: var(--muted-foreground);">CodeWalker</span>
+            </a>
+            <!-- Nav Links -->
+            <div class="flex items-center gap-6 sm:gap-8">
+              <a href="../pages/blog.html" class="text-sm font-medium transition-colors hover:opacity-80 whitespace-nowrap" style="color: var(--foreground);" data-dom-id="nav-blog">技术博客</a>
+              <a href="../pages/projects.html" class="text-sm font-medium transition-colors hover:opacity-80 whitespace-nowrap" style="color: var(--muted-foreground);" data-dom-id="nav-projects">开源作品</a>
+              <a href="../pages/courses.html" class="text-sm font-medium transition-colors hover:opacity-80 whitespace-nowrap" style="color: var(--muted-foreground);" data-dom-id="nav-courses">教学课程</a>
+              <a href="../pages/about.html" class="text-sm font-medium transition-colors hover:opacity-80 whitespace-nowrap" style="color: var(--muted-foreground);" data-dom-id="nav-about">关于我</a>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- ========== ARTICLE LAYOUT: Content + Sidebar ========== -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
+
+          <!-- ===== MAIN ARTICLE COLUMN ===== -->
+          <article class="flex-1 min-w-0 max-w-3xl mx-auto w-full lg:mx-0">
+
+            <!-- Back to Blog -->
+            <a href="../pages/blog.html" class="hideEdge inline-flex items-center gap-1.5 text-sm mb-8 transition-colors hover:opacity-80" style="color: var(--muted-foreground);" data-dom-id="back-blog">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i>
+              返回博客列表
+            </a>
+
+            <!-- ===== ARTICLE HEADER ===== -->
+            <header class="mb-8">
+              <!-- Category Tag -->
+              <span class="inline-block text-xs font-medium px-3 py-1 rounded-lg mb-5 whitespace-nowrap" style="background: var(--secondary); color: var(--primary);">分布式系统</span>
+
+              <!-- Title -->
+              <h1 class="text-3xl sm:text-4xl lg:text-[2.75rem] font-bold leading-tight mb-6" style="font-family: var(--brand-serif); color: var(--foreground); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">
+                深入理解 Go 语言并发模型：从 Goroutine 到 Channel
+              </h1>
+
+              <!-- Meta Info -->
+              <div class="flex flex-wrap items-center gap-3 text-sm" style="color: var(--muted-foreground);">
+                <img src="../assets/image_0_yi19x4.jpg" alt="码上行" class="w-9 h-9 rounded-full object-cover" />
+                <span class="font-medium" style="color: var(--foreground);">码上行</span>
+                <span class="hidden sm:inline" style="color: var(--border);">|</span>
+                <span class="flex items-center gap-1">
+                  <i data-lucide="calendar" class="w-4 h-4"></i>
+                  2026年6月28日
+                </span>
+                <span class="hidden sm:inline" style="color: var(--border);">|</span>
+                <span class="flex items-center gap-1">
+                  <i data-lucide="clock" class="w-4 h-4"></i>
+                  15 分钟阅读
+                </span>
+                <span class="hidden sm:inline" style="color: var(--border);">|</span>
+                <span class="flex items-center gap-1">
+                  <i data-lucide="eye" class="w-4 h-4"></i>
+                  3,200 次阅读
+                </span>
+              </div>
+            </header>
+
+            <!-- ===== HERO IMAGE ===== -->
+            <figure class="mb-10">
+              <img src="../assets/image_2_yi19x4.jpg" alt="Go 并发模型示意图" class="w-full rounded-xl object-cover" style="aspect-ratio: 16/9;" />
+              <figcaption class="mt-3 text-xs text-center" style="color: var(--muted-foreground);">
+                Go 语言的 CSP 并发模型让开发者能够优雅地编写高并发程序
+              </figcaption>
+            </figure>
+
+            <!-- ===== ARTICLE BODY ===== -->
+            <div class="leading-1.75 text-base" style="line-height: 1.75; color: var(--foreground); font-family: var(--brand-sans);">
+
+              <!-- Introduction with Drop Cap -->
+              <section id="section-intro">
+                <p class="drop-cap mb-6 text-lg" style="line-height: 1.85;">
+                  并发编程是现代软件工程中最重要的课题之一。随着多核处理器和分布式系统的普及，如何高效地利用硬件资源、编写出既安全又高效的并发程序，已经成为每一位工程师的必备技能。Go 语言以其独特的 Goroutine 和 Channel 机制，为并发编程提供了一种全新的范式，让开发者能够在不牺牲可读性的前提下构建高性能系统。
+                </p>
+                <p class="mb-6">
+                  本文将从底层原理到工程实践，系统地解析 Go 语言的并发模型。我们将深入探讨 Goroutine 的调度机制、Channel 的通信模式，以及在真实分布式系统中如何运用这些原语来构建可靠的并发程序。
+                </p>
+              </section>
+
+              <!-- Section: Goroutine Basics -->
+              <section id="section-goroutine" class="mt-12">
+                <h2 class="text-2xl font-bold mb-6 pb-3 border-b" style="font-family: var(--brand-serif); color: var(--foreground); border-color: var(--border);">
+                  Goroutine 基础
+                </h2>
+
+                <p class="mb-6">
+                  Goroutine 是 Go 语言中轻量级线程的抽象。与操作系统线程动辄数 MB 的栈空间不同，Goroutine 的初始栈大小仅为 <code class="article-inline-code">2KB</code>，并且可以动态伸缩。这意味着在一台普通服务器上，我们可以轻松创建 <strong>数十万个 Goroutine</strong> 而不会耗尽系统资源。
+                </p>
+
+                <p class="mb-6">
+                  下面是一个展示 Goroutine 基本用法的示例代码：
+                </p>
+
+                <!-- Code Block -->
+                <div class="article-code mb-6">
+<pre><span class="kw">package</span> main
+
+<span class="kw">import</span> (
+    <span class="str">"fmt"</span>
+    <span class="str">"sync"</span>
+    <span class="str">"time"</span>
+)
+
+<span class="kw">func</span> <span class="fn">worker</span>(id <span class="typ">int</span>, wg *<span class="typ">sync.WaitGroup</span>) {
+    <span class="kw">defer</span> wg.<span class="fn">Done</span>()
+    <span class="kw">for</span> i := <span class="num">0</span>; i &lt; <span class="num">3</span>; i++ {
+        fmt.<span class="fn">Printf</span>(<span class="str">"Worker %d: 处理任务 %d\n"</span>, id, i)
+        time.<span class="fn">Sleep</span>(time.<span class="fn">Second</span>)
+    }
+}
+
+<span class="kw">func</span> <span class="fn">main</span>() {
+    <span class="kw">var</span> wg <span class="typ">sync.WaitGroup</span>
+
+    <span class="cmt">// 启动 5 个 Goroutine 并发执行</span>
+    <span class="kw">for</span> i := <span class="num">1</span>; i &lt;= <span class="num">5</span>; i++ {
+        wg.<span class="fn">Add</span>(<span class="num">1</span>)
+        <span class="kw">go</span> <span class="fn">worker</span>(i, &amp;wg)
+    }
+
+    wg.<span class="fn">Wait</span>()
+    fmt.<span class="fn">Println</span>(<span class="str">"所有任务已完成"</span>)
+}</pre>
+                </div>
+
+                <p class="mb-6">
+                  在这个例子中，我们使用 <code class="article-inline-code">sync.WaitGroup</code> 来协调多个 Goroutine 的执行。每个 Goroutine 独立处理自己的任务，而 <code class="article-inline-code">main</code> 函数通过 <code class="article-inline-code">Wait()</code> 等待所有任务完成后再退出。
+                </p>
+
+                <h3 class="text-xl font-bold mt-8 mb-4" style="font-family: var(--brand-serif); color: var(--foreground);">
+                  GMP 调度模型
+                </h3>
+
+                <p class="mb-6">
+                  Go 运行时采用了 <strong>GMP 调度模型</strong>：<em>G</em>oroutine（用户态协程）、<em>M</em>achine（内核线程）和 <em>P</em>rocessor（逻辑处理器）。这个模型的设计灵感来源于 C4 模型，通过两级调度实现了高效的负载均衡。
+                </p>
+
+                <div class="article-blockquote">
+                  <p>
+                    "Don't communicate by sharing memory; share memory by communicating." —— Go 语言的核心哲学之一。Channel 的设计正是这一理念的最佳体现。
+                  </p>
+                </div>
+              </section>
+
+              <!-- Section: Channel Communication Patterns -->
+              <section id="section-channel" class="mt-12">
+                <h2 class="text-2xl font-bold mb-6 pb-3 border-b" style="font-family: var(--brand-serif); color: var(--foreground); border-color: var(--border);">
+                  Channel 通信模式
+                </h2>
+
+                <p class="mb-6">
+                  Channel 是 Go 语言中 Goroutine 之间通信的桥梁。它遵循 <strong>CSP（Communicating Sequential Processes）</strong> 模型，提供了一种安全、优雅的并发数据传递方式。通过 Channel，我们可以避免传统并发编程中的锁竞争和竞态条件问题。
+                </p>
+
+                <p class="mb-6">
+                  下面展示了一个使用 <code class="article-inline-code">channel</code> 实现 <em>生产者-消费者</em> 模式的经典案例：
+                </p>
+
+                <!-- Code Block: Channel -->
+                <div class="article-code mb-6">
+<pre><span class="kw">package</span> main
+
+<span class="kw">import</span> (
+    <span class="str">"fmt"</span>
+    <span class="str">"time"</span>
+)
+
+<span class="cmt">// 生产者：向 channel 发送数据</span>
+<span class="kw">func</span> <span class="fn">producer</span>(ch <span class="typ">chan</span>&lt;- <span class="typ">string</span>, name <span class="typ">string</span>) {
+    <span class="kw">for</span> i := <span class="num">0</span>; i &lt; <span class="num">5</span>; i++ {
+        msg := fmt.<span class="fn">Sprintf</span>(<span class="str">"%s: 任务-%d"</span>, name, i+<span class="num">1</span>)
+        ch &lt;- msg <span class="cmt">// 发送消息到 channel</span>
+        fmt.<span class="fn">Printf</span>(<span class="str">"[生产者] %s 已发送\n"</span>, msg)
+        time.<span class="fn">Sleep</span>(<span class="num">200</span> * time.Millisecond)
+    }
+    <span class="kw">close</span>(ch) <span class="cmt">// 关闭 channel，通知消费者结束</span>
+}
+
+<span class="cmt">// 消费者：从 channel 接收并处理数据</span>
+<span class="kw">func</span> <span class="fn">consumer</span>(ch &lt;-<span class="typ">chan</span> <span class="typ">string</span>, done <span class="typ">chan</span> <span class="typ">bool</span>) {
+    <span class="kw">for</span> msg := <span class="kw">range</span> ch { <span class="cmt">// 自动感知 channel 关闭</span>
+        fmt.<span class="fn">Printf</span>(<span class="str">"[消费者] 收到: %s\n"</span>, msg)
+        time.<span class="fn">Sleep</span>(<span class="num">500</span> * time.Millisecond)
+    }
+    done &lt;- <span class="num">true</span>
+}
+
+<span class="kw">func</span> <span class="fn">main</span>() {
+    ch := <span class="fn">make</span>(<span class="kw">chan</span> <span class="typ">string</span>, <span class="num">3</span>) <span class="cmt">// 缓冲 channel，容量 3</span>
+    done := <span class="fn">make</span>(<span class="kw">chan</span> <span class="typ">bool</span>)
+
+    <span class="kw">go</span> <span class="fn">producer</span>(ch, <span class="str">"服务-A"</span>)
+    <span class="kw">go</span> <span class="fn">consumer</span>(ch, done)
+
+    &lt;-done <span class="cmt">// 等待消费完成</span>
+    fmt.<span class="fn">Println</span>(<span class="str">"所有数据处理完毕"</span>)
+}</pre>
+                </div>
+
+                <p class="mb-6">
+                  这段代码展示了 Channel 的几个关键特性：<code class="article-inline-code">make(chan string, 3)</code> 创建了带缓冲的 Channel，<code class="article-inline-code">close(ch)</code> 用于安全关闭，而 <code class="article-inline-code">for range ch</code> 则会自动在 Channel 关闭时退出循环。
+                </p>
+
+                <!-- Figure / Diagram Placeholder -->
+                <figure class="my-8">
+                  <div class="figure-placeholder p-8">
+                    <i data-lucide="git-branch" class="w-10 h-10 mb-3" style="color: var(--muted-foreground);"></i>
+                    <p class="text-sm font-medium" style="color: var(--muted-foreground);">CSP 并发模型流程图</p>
+                    <p class="text-xs mt-1" style="color: var(--border);">Goroutine A → Channel → Goroutine B 数据流示意</p>
+                  </div>
+                  <figcaption class="mt-3 text-xs text-center" style="color: var(--muted-foreground);">
+                    图 1：基于 Channel 的生产者-消费者模型数据流向
+                  </figcaption>
+                </figure>
+              </section>
+
+              <!-- Section: Practical Case -->
+              <section id="section-practice" class="mt-12">
+                <h2 class="text-2xl font-bold mb-6 pb-3 border-b" style="font-family: var(--brand-serif); color: var(--foreground); border-color: var(--border);">
+                  实战案例
+                </h2>
+
+                <p class="mb-6">
+                  在实际的分布式系统中，Go 的并发原语被广泛应用于各种场景。让我们看一个更贴近真实业务的例子——一个 <strong>带有超时控制和错误恢复的并发任务调度器</strong>：
+                </p>
+
+                <!-- Code Block: Practical -->
+                <div class="article-code mb-6">
+<pre><span class="kw">package</span> main
+
+<span class="kw">import</span> (
+    <span class="str">"context"</span>
+    <span class="str">"fmt"</span>
+    <span class="str">"math/rand"</span>
+    <span class="str">"time"</span>
+)
+
+<span class="cmt">// Task 表示一个可执行的异步任务</span>
+<span class="kw">type</span> <span class="typ">Task</span> <span class="kw">struct</span> {
+    ID   <span class="typ">int</span>
+    Name <span class="typ">string</span>
+}
+
+<span class="cmt">// RunWithTimeout 在指定超时内执行任务</span>
+<span class="kw">func</span> (t <span class="typ">Task</span>) <span class="fn">RunWithTimeout</span>(ctx <span class="typ">context.Context</span>) <span class="typ">error</span> {
+    result := <span class="fn">make</span>(<span class="kw">chan</span> <span class="typ">error</span>, <span class="num">1</span>)
+
+    <span class="kw">go</span> <span class="kw">func</span>() {
+        <span class="cmt">// 模拟工作负载</span>
+        delay := time.<span class="fn">Duration</span>(rand.<span class="fn">Intn</span>(<span class="num">500</span>)) * time.Millisecond
+        <span class="kw">select</span> {
+        <span class="kw">case</span> &lt;-time.<span class="fn">After</span>(delay):
+            result &lt;- <span class="num">nil</span>
+        <span class="kw">case</span> &lt;-ctx.<span class="fn">Done</span>():
+            result &lt;- ctx.<span class="fn">Err</span>()
+        }
+    }()
+
+    <span class="kw">select</span> {
+    <span class="kw">case</span> err := &lt;-result:
+        <span class="kw">if</span> err == <span class="num">nil</span> {
+            fmt.<span class="fn">Printf</span>(<span class="str">"[OK] 任务 %d (%s) 完成\n"</span>, t.ID, t.Name)
+        }
+        <span class="kw">return</span> err
+    <span class="kw">case</span> &lt;-ctx.<span class="fn">Done</span>():
+        <span class="kw">return</span> fmt.<span class="fn">Errorf</span>(<span class="str">"任务 %d 超时: %v"</span>, t.ID, ctx.<span class="fn">Err</span>())
+    }
+}
+
+<span class="kw">func</span> <span class="fn">main</span>() {
+    tasks := []<span class="typ">Task</span>{
+        {ID: <span class="num">1</span>, Name: <span class="str">"数据同步"</span>},
+        {ID: <span class="num">2</span>, Name: <span class="str">"日志聚合"</span>},
+        {ID: <span class="num">3</span>, Name: <span class="str">"指标采集"</span>},
+    }
+
+    ctx, cancel := context.<span class="fn">WithTimeout</span>(
+        context.<span class="fn">Background</span>(), <span class="num">300</span>*time.Millisecond,
+    )
+    <span class="kw">defer</span> <span class="fn">cancel</span>()
+
+    <span class="kw">for</span> _, task := <span class="kw">range</span> tasks {
+        <span class="kw">if</span> err := task.<span class="fn">RunWithTimeout</span>(ctx); err != <span class="num">nil</span> {
+            fmt.<span class="fn">Printf</span>(<span class="str">"[ERR] %v\n"</span>, err)
+        }
+    }
+}</pre>
+                </div>
+
+                <p class="mb-6">
+                  这个调度器使用了 <code class="article-inline-code">context.Context</code> 来实现统一的超时控制和取消信号传播，是 Go 语言在云原生场景下的典型应用模式。结合 <code class="article-inline-code">select</code> 语句，我们可以灵活地处理多个并发操作的结果。
+                </p>
+              </section>
+
+              <!-- Section: Performance Tuning -->
+              <section id="section-tuning" class="mt-12">
+                <h2 class="text-2xl font-bold mb-6 pb-3 border-b" style="font-family: var(--brand-serif); color: var(--foreground); border-color: var(--border);">
+                  性能调优
+                </h2>
+
+                <p class="mb-6">
+                  在大规模并发场景中，仅仅理解基本用法是不够的。我们需要关注以下几个关键的性能优化方向：
+                </p>
+
+                <div class="article-blockquote">
+                  <p>
+                    性能优化的核心不在于让代码跑得更快，而在于让每一行代码都有意义。过度并发往往比并发不足更危险。
+                  </p>
+                </div>
+
+                <ol class="list-decimal list-outside ml-6 mb-6 space-y-3" style="line-height: 1.75;">
+                  <li><strong>控制 Goroutine 数量</strong>：使用 <code class="article-inline-code">semaphore</code> 或 Worker Pool 模式限制并发度，避免 Goroutine 爆炸式增长</li>
+                  <li><strong>合理设置 Channel 缓冲</strong>：根据生产者和消费者的速率差异，选择合适的缓冲大小以减少阻塞等待</li>
+                  <li><strong>减少锁的粒度</strong>：在必须使用 <code class="article-inline-code">sync.Mutex</code> 的场景，尽量缩小临界区范围，并考虑使用 <code class="article-inline-code">sync.RWMutex</code></li>
+                  <li><strong>利用 <code class="article-inline-code">pprof</code> 分析瓶颈</strong>：定期使用 Go 内置的性能分析工具定位 CPU、内存和 Goroutine 泄漏问题</li>
+                  <li><strong>善用 <code class="article-inline-code">sync.Pool</code></strong>：对于频繁创建和销毁的对象，使用对象池减少 GC 压力</li>
+                </ol>
+
+                <p class="mb-6">
+                  在实际项目中，我通常会在服务启动时初始化一个全局的 <em>Worker Pool</em>，并通过配置文件动态调整并发 Worker 数量。这样既能保证系统的弹性伸缩能力，又不会因为 Goroutine 数量失控而影响服务稳定性。
+                </p>
+              </section>
+
+              <!-- Section: Summary -->
+              <section id="section-summary" class="mt-12">
+                <h2 class="text-2xl font-bold mb-6 pb-3 border-b" style="font-family: var(--brand-serif); color: var(--foreground); border-color: var(--border);">
+                  总结
+                </h2>
+
+                <p class="mb-6">
+                  Go 语言的并发模型之所以优雅，在于它将复杂的并发问题简化为两个核心抽象：<strong>Goroutine</strong>（执行单元）和 <strong>Channel</strong>（通信单元）。通过这两个原语，开发者可以用接近顺序编程的思维方式来构建高并发的分布式系统。
+                </p>
+
+                <p class="mb-6">
+                  从 <code class="article-inline-code">go</code> 关键字启动一个 Goroutine，到 <code class="article-inline-code">select</code> 语句处理复杂的路由逻辑，再到 <code class="article-inline-code">context.Context</code> 实现优雅的超时与取消控制——Go 语言为并发编程提供了一套 <em>完整且一致</em> 的工具链。掌握这些工具，不仅是提升代码质量的关键，更是成为一名合格分布式系统工程师的必经之路。
+                </p>
+
+                <p class="mb-0">
+                  如果你对本文的内容有任何疑问或想法，欢迎在下方评论区留言讨论。下一篇文章中，我们将深入分析 <strong>Go 内存模型</strong> 以及 <code class="article-inline-code">happens-before</code> 规则在并发编程中的应用。
+                </p>
+              </section>
+
+            </div>
+            <!-- End Article Body -->
+
+            <!-- ===== AUTHOR BOX / ARTICLE FOOTER ===== -->
+            <div class="mt-16 pt-8 border-t" style="border-color: var(--border);">
+              <div class="flex flex-col sm:flex-row items-start gap-5">
+                <img src="../assets/image_0_yi19x4.jpg" alt="码上行" class="w-16 h-16 rounded-xl object-cover shrink-0" />
+                <div class="min-w-0">
+                  <h4 class="text-lg font-bold mb-1" style="font-family: var(--brand-serif); color: var(--foreground);">码上行</h4>
+                  <p class="text-sm mb-3" style="color: var(--muted-foreground); line-height: 1.7;">
+                    码上行，开源工程师，热爱分布式系统和云原生技术。
+                  </p>
+                  <!-- Social Links -->
+                  <div class="flex items-center gap-4 mb-4">
+                    <a href="#" class="flex items-center gap-1.5 text-sm transition-colors hover:opacity-80 whitespace-nowrap" style="color: var(--muted-foreground);">
+                      <i data-lucide="github" class="w-4 h-4"></i>
+                      GitHub
+                    </a>
+                    <a href="#" class="flex items-center gap-1.5 text-sm transition-colors hover:opacity-80 whitespace-nowrap" style="color: var(--muted-foreground);">
+                      <i data-lucide="twitter" class="w-4 h-4"></i>
+                      Twitter
+                    </a>
+                    <a href="#" class="flex items-center gap-1.5 text-sm transition-colors hover:opacity-80 whitespace-nowrap" style="color: var(--muted-foreground);">
+                      <i data-lucide="message-circle" class="w-4 h-4"></i>
+                      微信
+                    </a>
+                  </div>
+                  <!-- Tags -->
+                  <div class="flex flex-wrap gap-2">
+                    <span class="text-xs px-2.5 py-1 rounded-lg whitespace-nowrap" style="background: var(--secondary); color: var(--primary);">Go</span>
+                    <span class="text-xs px-2.5 py-1 rounded-lg whitespace-nowrap" style="background: var(--secondary); color: var(--primary);">并发编程</span>
+                    <span class="text-xs px-2.5 py-1 rounded-lg whitespace-nowrap" style="background: var(--secondary); color: var(--primary);">分布式系统</span>
+                    <span class="text-xs px-2.5 py-1 rounded-lg whitespace-nowrap" style="background: var(--secondary); color: var(--primary);">Channel</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ===== COMMENT SECTION ===== -->
+            <section class="mt-16 pt-8 border-t" style="border-color: var(--border);">
+              <h3 class="text-xl font-bold mb-8" style="font-family: var(--brand-serif); color: var(--foreground);">
+                讨论
+              </h3>
+
+              <!-- Comment Input -->
+              <div class="p-5 rounded-xl mb-8" style="background: var(--card); border: 1px solid var(--border);">
+                <textarea placeholder="写下你的想法..." rows="3" class="w-full text-sm p-3 rounded-lg resize-none focus:outline-none" style="background: var(--secondary); border: 1px solid var(--border); color: var(--foreground); font-family: var(--brand-sans);"></textarea>
+                <div class="flex justify-end mt-3">
+                  <button class="px-5 py-2 text-sm font-medium rounded-lg transition-colors" style="background: var(--primary); color: var(--primary-foreground);">
+                    发表评论
+                  </button>
+                </div>
+              </div>
+
+              <!-- Sample Comments -->
+              <div class="space-y-6">
+                <!-- Comment 1 -->
+                <div class="flex gap-4">
+                  <div class="w-10 h-10 rounded-full shrink-0 flex items-center justify-center text-sm font-bold" style="background: var(--secondary); color: var(--primary);">
+                    林
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-3 mb-1">
+                      <span class="text-sm font-medium" style="color: var(--foreground);">林远方</span>
+                      <span class="text-xs whitespace-nowrap" style="color: var(--muted-foreground);">2 天前</span>
+                    </div>
+                    <p class="text-sm" style="color: var(--secondary-foreground); line-height: 1.7;">
+                      写得非常清晰！关于 Worker Pool 模式的部分正是我在项目中遇到的问题。请问在生产环境中，你一般设置多少个并发 Worker 比较合适？
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Comment 2 -->
+                <div class="flex gap-4">
+                  <div class="w-10 h-10 rounded-full shrink-0 flex items-center justify-center text-sm font-bold" style="background: var(--secondary); color: var(--primary);">
+                    陈
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-3 mb-1">
+                      <span class="text-sm font-medium" style="color: var(--foreground);">陈思远</span>
+                      <span class="text-xs whitespace-nowrap" style="color: var(--muted-foreground);">5 天前</span>
+                    </div>
+                    <p class="text-sm" style="color: var(--secondary-foreground); line-height: 1.7;">
+                      Channel 的生产者-消费者例子非常直观。我之前一直用共享内存加锁的方式，看完这篇文章后打算重构一下。期待下一篇关于内存模型的文章！
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- ===== RELATED ARTICLES ===== -->
+            <section class="mt-16 pt-8 border-t" style="border-color: var(--border);">
+              <h3 class="text-xl font-bold mb-8" style="font-family: var(--brand-serif); color: var(--foreground);">
+                相关推荐
+              </h3>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <!-- Related Card 1 -->
+                <a href="#" class="group rounded-xl overflow-hidden transition-shadow hover:shadow-md" style="background: var(--card); border: 1px solid var(--border);">
+                  <img src="../assets/image_2_yi19x4.jpg" alt="Kubernetes 集群管理" class="w-full object-cover" style="aspect-ratio: 16/9;" />
+                  <div class="p-4">
+                    <h4 class="text-sm font-bold mb-2 line-clamp-2" style="font-family: var(--brand-serif); color: var(--foreground);">Kubernetes 集群管理实战指南</h4>
+                    <p class="text-xs whitespace-nowrap truncate" style="color: var(--muted-foreground);">2026年6月15日</p>
+                  </div>
+                </a>
+
+                <!-- Related Card 2 -->
+                <a href="#" class="group rounded-xl overflow-hidden transition-shadow hover:shadow-md" style="background: var(--card); border: 1px solid var(--border);">
+                  <img src="../assets/image_2_yi19x4.jpg" alt="微服务架构设计" class="w-full object-cover" style="aspect-ratio: 16/9;" />
+                  <div class="p-4">
+                    <h4 class="text-sm font-bold mb-2 line-clamp-2" style="font-family: var(--brand-serif); color: var(--foreground);">微服务架构设计：从单体到分布式的演进之路</h4>
+                    <p class="text-xs whitespace-nowrap truncate" style="color: var(--muted-foreground);">2026年5月20日</p>
+                  </div>
+                </a>
+
+                <!-- Related Card 3 -->
+                <a href="#" class="group rounded-xl overflow-hidden transition-shadow hover:shadow-md" style="background: var(--card); border: 1px solid var(--border);">
+                  <img src="../assets/image_2_yi19x4.jpg" alt="Rust 异步编程" class="w-full object-cover" style="aspect-ratio: 16/9;" />
+                  <div class="p-4">
+                    <h4 class="text-sm font-bold mb-2 line-clamp-2" style="font-family: var(--brand-serif); color: var(--foreground);">Rust 异步编程入门：Tokio 运行时深度解析</h4>
+                    <p class="text-xs whitespace-nowrap truncate" style="color: var(--muted-foreground);">2026年4月10日</p>
+                  </div>
+                </a>
+              </div>
+            </section>
+
+          </article>
+
+          <!-- ===== RIGHT SIDEBAR: TABLE OF CONTENTS ===== -->
+          <aside class="hidden lg:block w-56 xl:w-64 shrink-0">
+            <div class="sticky top-24">
+              <h4 class="text-xs font-bold uppercase tracking-wider mb-4" style="color: var(--muted-foreground);">
+                目录
+              </h4>
+              <nav class="space-y-2.5">
+                <a href="#section-intro" class="toc-link active block text-sm transition-colors" style="color: var(--primary); border-left-color: var(--accent);">
+                  引言
+                </a>
+                <a href="#section-goroutine" class="toc-link block text-sm transition-colors">
+                  Goroutine 基础
+                </a>
+                <a href="#section-channel" class="toc-link block text-sm transition-colors">
+                  Channel 通信模式
+                </a>
+                <a href="#section-practice" class="toc-link block text-sm transition-colors">
+                  实战案例
+                </a>
+                <a href="#section-tuning" class="toc-link block text-sm transition-colors">
+                  性能调优
+                </a>
+                <a href="#section-summary" class="toc-link block text-sm transition-colors">
+                  总结
+                </a>
+              </nav>
+
+              <!-- Sidebar Share -->
+              <div class="mt-10 pt-6 border-t" style="border-color: var(--border);">
+                <h4 class="text-xs font-bold uppercase tracking-wider mb-3" style="color: var(--muted-foreground);">
+                  分享文章
+                </h4>
+                <div class="flex items-center gap-3">
+                  <a href="#" class="w-9 h-9 rounded-lg flex items-center justify-center transition-colors" style="background: var(--secondary); color: var(--muted-foreground);">
+                    <i data-lucide="link" class="w-4 h-4"></i>
+                  </a>
+                  <a href="#" class="w-9 h-9 rounded-lg flex items-center justify-center transition-colors" style="background: var(--secondary); color: var(--muted-foreground);">
+                    <i data-lucide="twitter" class="w-4 h-4"></i>
+                  </a>
+                  <a href="#" class="w-9 h-9 rounded-lg flex items-center justify-center transition-colors" style="background: var(--secondary); color: var(--muted-foreground);">
+                    <i data-lucide="share-2" class="w-4 h-4"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+        </div>
+      </div>
+
+      <!-- ========== FOOTER ========== -->
+      <footer class="mt-20 border-t" style="border-color: var(--border); background: var(--secondary);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-2">
+              <span class="text-lg font-bold" style="font-family: var(--brand-serif); color: var(--primary);">码上行</span>
+              <span class="text-xs" style="color: var(--muted-foreground);">CodeWalker</span>
+            </div>
+            <p class="text-xs" style="color: var(--muted-foreground);">
+              &copy; 2026 码上行. 以开源精神构建，以技术改变世界。
+            </p>
+            <div class="flex items-center gap-4">
+              <a href="#" class="text-xs transition-colors hover:opacity-80 whitespace-nowrap" style="color: var(--muted-foreground);">GitHub</a>
+              <a href="#" class="text-xs transition-colors hover:opacity-80 whitespace-nowrap" style="color: var(--muted-foreground);">Twitter</a>
+              <a href="#" class="text-xs transition-colors hover:opacity-80 whitespace-nowrap" style="color: var(--muted-foreground);">RSS</a>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

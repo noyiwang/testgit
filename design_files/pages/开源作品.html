@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>开源作品 - 码上行</title>
+    <style id="theme-vars">
+/* ============================================
+   码上行 (CodeWalker) Brand Tokens
+   Warm Humanistic Tech — Cream, Amber, Serif
+   ============================================ */
+:root {
+  /* Backgrounds */
+  --brand-background: #FFFBF5;
+  --brand-muted: #F5EDE0;
+  --brand-card: #FFFFFF;
+  --brand-card-hover: #FFF9F0;
+
+  /* Text */
+  --brand-foreground: #2C1810;
+  --brand-foreground-secondary: #6B5344;
+  --brand-foreground-muted: #9C8577;
+
+  /* Accent */
+  --brand-primary: #C8820C;
+  --brand-primary-light: #F5D699;
+  --brand-primary-dark: #9A6309;
+
+  /* Borders */
+  --brand-border: #E8DDD0;
+  --brand-border-light: #F0E8DC;
+
+  /* Shadows */
+  --brand-shadow-sm: 0 1px 3px rgba(44,24,16,0.06);
+  --brand-shadow-md: 0 4px 12px rgba(44,24,16,0.08);
+
+  /* Typography */
+  --font-serif: 'Georgia', 'Noto Serif SC', serif;
+  --font-sans: 'Inter', 'Noto Sans SC', system-ui, sans-serif;
+  --font-code: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', monospace;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Spacing */
+  --section-padding: 80px;
+  --container-max: 1200px;
+}
+
+.dark {
+  --brand-background: #1A1410;
+  --brand-muted: #2A2018;
+  --brand-card: #242018;
+  --brand-card-hover: #2E2820;
+  --brand-foreground: #F0E8DC;
+  --brand-foreground-secondary: #BBA898;
+  --brand-foreground-muted: #8A7768;
+  --brand-primary: #F5C24C;
+  --brand-primary-light: #3D3018;
+  --brand-primary-dark: #E5A820;
+  --brand-border: #3D3228;
+  --brand-border-light: #302820;
+  --brand-shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
+  --brand-shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+
+  @layer base {
+    body {
+      background: var(--brand-background);
+      color: var(--brand-foreground);
+      font-family: var(--font-sans);
+    }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+
+  @theme inline {
+    --color-primary: var(--brand-primary);
+    --color-primary-light: var(--brand-primary-light);
+    --color-primary-dark: var(--brand-primary-dark);
+    --color-foreground: var(--brand-foreground);
+    --color-foreground-secondary: var(--brand-foreground-secondary);
+    --color-foreground-muted: var(--brand-foreground-muted);
+    --color-muted: var(--brand-muted);
+    --color-card: var(--brand-card);
+    --color-card-hover: var(--brand-card-hover);
+    --color-border: var(--brand-border);
+    --color-border-light: var(--brand-border-light);
+    --color-background: var(--brand-background);
+  }
+
+  @layer components {
+    .font-serif { font-family: var(--font-serif); }
+    .font-code { font-family: var(--font-code); }
+    .container-brand { max-width: var(--container-max); margin-left: auto; margin-right: auto; }
+    .section-padding { padding-top: var(--section-padding); padding-bottom: var(--section-padding); }
+
+    .nav-link {
+      color: var(--brand-foreground-muted);
+      transition: color 0.2s;
+      position: relative;
+      padding-bottom: 2px;
+    }
+    .nav-link:hover { color: var(--brand-primary); }
+    .nav-link.active {
+      color: var(--brand-primary);
+      font-weight: 600;
+    }
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--brand-primary);
+      border-radius: 1px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--brand-primary);
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 14px;
+      transition: background 0.2s, transform 0.1s;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .btn-primary:hover { background: var(--brand-primary-dark); transform: translateY(-1px); }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--brand-primary);
+      padding: 12px 24px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 14px;
+      border: 1.5px solid var(--brand-primary);
+      transition: background 0.2s, transform 0.1s;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .btn-secondary:hover { background: var(--brand-primary-light); transform: translateY(-1px); }
+
+    .card {
+      background: var(--brand-card);
+      border: 1px solid var(--brand-border);
+      border-radius: var(--radius-lg);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+      border-color: var(--brand-primary-light);
+      box-shadow: var(--brand-shadow-md);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .lang-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .contrib-cell {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      background: var(--brand-border-light);
+    }
+    .contrib-1 { background: #E5D8A8; }
+    .contrib-2 { background: #D4B95A; }
+    .contrib-3 { background: #C8820C; }
+    .contrib-4 { background: #9A6309; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main>
+
+      <!-- ======== Top Navigation Bar ======== -->
+      <nav class="w-full" style="background: var(--brand-background); border-bottom: 1px solid var(--brand-border-light);">
+        <div class="container-brand px-6 lg:px-8">
+          <div class="flex items-center justify-between h-16">
+            <!-- Brand -->
+            <a href="../pages/index.html" class="font-serif text-xl font-bold" style="color: var(--brand-foreground);">
+              码上行
+            </a>
+            <!-- Nav Links -->
+            <div class="hidden sm:flex items-center gap-8">
+              <a href="../pages/index.html" class="nav-link text-sm" data-dom-id="nav-index">首页</a>
+              <a href="../pages/blog.html" class="nav-link text-sm" data-dom-id="nav-blog">技术博客</a>
+              <a href="../pages/courses.html" class="nav-link text-sm" data-dom-id="nav-courses">教学课程</a>
+              <a href="../pages/projects.html" class="nav-link active text-sm" data-dom-id="nav-projects">开源作品</a>
+              <a href="../pages/about.html" class="nav-link text-sm" data-dom-id="nav-about">关于我</a>
+            </div>
+            <!-- Mobile menu button -->
+            <button class="sm:hidden p-2" style="color: var(--brand-foreground-muted);" aria-label="菜单">
+              <i data-lucide="menu" class="w-5 h-5"></i>
+            </button>
+          </div>
+          <!-- Mobile Nav -->
+          <div class="sm:hidden pb-4 flex flex-wrap gap-4">
+            <a href="../pages/index.html" class="nav-link text-sm" data-dom-id="nav-index">首页</a>
+            <a href="../pages/blog.html" class="nav-link text-sm" data-dom-id="nav-blog">技术博客</a>
+            <a href="../pages/courses.html" class="nav-link text-sm" data-dom-id="nav-courses">教学课程</a>
+            <a href="../pages/projects.html" class="nav-link active text-sm" data-dom-id="nav-projects">开源作品</a>
+            <a href="../pages/about.html" class="nav-link text-sm" data-dom-id="nav-about">关于我</a>
+          </div>
+        </div>
+      </nav>
+
+      <!-- ======== Page Header ======== -->
+      <section class="section-padding">
+        <div class="container-brand px-6 lg:px-8">
+          <div class="max-w-2xl">
+            <h1 class="font-serif" style="font-size: clamp(36px, 5vw, 64px); font-weight: 700; line-height: 1.15; color: var(--brand-foreground); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">
+              开源作品
+            </h1>
+            <p class="mt-4 text-lg" style="color: var(--brand-foreground-secondary); line-height: 1.7;">
+              用代码构建更好的工具，与社区一起进步
+            </p>
+            <div class="mt-6 flex flex-wrap items-center gap-3">
+              <span class="badge" style="background: var(--brand-muted); color: var(--brand-foreground-secondary);">
+                <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--brand-primary);"></i>
+                总 Star 数 8.5K
+              </span>
+              <span class="badge" style="background: var(--brand-muted); color: var(--brand-foreground-secondary);">
+                <i data-lucide="git-repo" class="w-3.5 h-3.5" style="color: var(--brand-primary);"></i>
+                15 个仓库
+              </span>
+              <span class="badge" style="background: var(--brand-muted); color: var(--brand-foreground-secondary);">
+                <i data-lucide="users" class="w-3.5 h-3.5" style="color: var(--brand-primary);"></i>
+                120+ 贡献者
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======== Featured Project (Hero Card) ======== -->
+      <section class="pb-12">
+        <div class="container-brand px-6 lg:px-8">
+          <div class="card overflow-hidden" style="box-shadow: var(--brand-shadow-md);">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
+              <!-- Image Side -->
+              <div class="relative overflow-hidden" style="min-height: 320px;">
+                <img src="../assets/image_4_yi19x4.jpg" alt="GoFlow 工作流引擎示意图"
+                     class="absolute inset-0 w-full h-full object-cover" loading="lazy">
+                <div class="absolute top-4 left-4">
+                  <span class="badge" style="background: var(--brand-primary); color: #fff; font-weight: 700;">
+                    <i data-lucide="star" class="w-3.5 h-3.5"></i>
+                    Star 项目
+                  </span>
+                </div>
+              </div>
+              <!-- Content Side -->
+              <div class="p-6 lg:p-10 flex flex-col justify-center">
+                <h2 class="font-serif" style="font-size: clamp(28px, 3.5vw, 42px); font-weight: 700; color: var(--brand-foreground); text-wrap: balance; word-break: keep-all;">
+                  GoFlow
+                </h2>
+                <p class="mt-4" style="color: var(--brand-foreground-secondary); line-height: 1.7;">
+                  轻量级 Go 工作流引擎，支持 DAG 任务编排、可视化管理面板和插件扩展
+                </p>
+
+                <!-- Key Metrics -->
+                <div class="mt-6 flex flex-wrap gap-5">
+                  <div class="flex items-center gap-2 text-sm" style="color: var(--brand-foreground-secondary);">
+                    <i data-lucide="star" class="w-4 h-4" style="color: var(--brand-primary);"></i>
+                    <span class="font-semibold" style="color: var(--brand-foreground);">3,200</span> Stars
+                  </div>
+                  <div class="flex items-center gap-2 text-sm" style="color: var(--brand-foreground-secondary);">
+                    <i data-lucide="git-fork" class="w-4 h-4" style="color: var(--brand-primary);"></i>
+                    <span class="font-semibold" style="color: var(--brand-foreground);">420</span> Forks
+                  </div>
+                  <div class="flex items-center gap-2 text-sm" style="color: var(--brand-foreground-secondary);">
+                    <i data-lucide="download" class="w-4 h-4" style="color: var(--brand-primary);"></i>
+                    <span class="font-semibold" style="color: var(--brand-foreground);">12K</span> Downloads
+                  </div>
+                </div>
+
+                <!-- Tech Stack -->
+                <div class="mt-4 flex flex-wrap items-center gap-2">
+                  <span class="font-code text-xs px-2.5 py-1 rounded-md" style="background: var(--brand-muted); color: var(--brand-foreground-secondary);">Go</span>
+                  <span class="font-code text-xs px-2.5 py-1 rounded-md" style="background: var(--brand-muted); color: var(--brand-foreground-secondary);">React</span>
+                  <span class="font-code text-xs px-2.5 py-1 rounded-md" style="background: var(--brand-muted); color: var(--brand-foreground-secondary);">PostgreSQL</span>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="mt-8 flex flex-wrap gap-3">
+                  <a href="#" class="btn-primary">
+                    <i data-lucide="github" class="w-4 h-4"></i>
+                    查看源码
+                  </a>
+                  <a href="#" class="btn-secondary">
+                    <i data-lucide="external-link" class="w-4 h-4"></i>
+                    在线演示
+                  </a>
+                </div>
+
+                <!-- Mini Contribution Activity -->
+                <div class="mt-6 pt-5" style="border-top: 1px solid var(--brand-border-light);">
+                  <p class="text-xs mb-2" style="color: var(--brand-foreground-muted);">近期贡献活动</p>
+                  <div class="flex flex-nowrap gap-0.5 overflow-hidden" aria-hidden="true">
+                    <div class="contrib-cell contrib-1"></div>
+                    <div class="contrib-cell"></div>
+                    <div class="contrib-cell contrib-2"></div>
+                    <div class="contrib-cell contrib-3"></div>
+                    <div class="contrib-cell contrib-1"></div>
+                    <div class="contrib-cell"></div>
+                    <div class="contrib-cell contrib-1"></div>
+                    <div class="contrib-cell contrib-2"></div>
+                    <div class="contrib-cell contrib-4"></div>
+                    <div class="contrib-cell contrib-3"></div>
+                    <div class="contrib-cell contrib-2"></div>
+                    <div class="contrib-cell"></div>
+                    <div class="contrib-cell contrib-1"></div>
+                    <div class="contrib-cell contrib-3"></div>
+                    <div class="contrib-cell contrib-4"></div>
+                    <div class="contrib-cell contrib-2"></div>
+                    <div class="contrib-cell contrib-1"></div>
+                    <div class="contrib-cell"></div>
+                    <div class="contrib-cell contrib-1"></div>
+                    <div class="contrib-cell contrib-2"></div>
+                    <div class="contrib-cell contrib-3"></div>
+                    <div class="contrib-cell contrib-4"></div>
+                    <div class="contrib-cell contrib-1"></div>
+                    <div class="contrib-cell contrib-2"></div>
+                    <div class="contrib-cell"></div>
+                    <div class="contrib-cell contrib-1"></div>
+                    <div class="contrib-cell contrib-3"></div>
+                    <div class="contrib-cell contrib-2"></div>
+                    <div class="contrib-cell contrib-4"></div>
+                    <div class="contrib-cell contrib-1"></div>
+                    <div class="contrib-cell"></div>
+                    <div class="contrib-cell contrib-2"></div>
+                    <div class="contrib-cell contrib-1"></div>
+                    <div class="contrib-cell contrib-3"></div>
+                    <div class="contrib-cell contrib-4"></div>
+                    <div class="contrib-cell contrib-2"></div>
+                    <div class="contrib-cell contrib-1"></div>
+                    <div class="contrib-cell"></div>
+                    <div class="contrib-cell contrib-1"></div>
+                    <div class="contrib-cell contrib-3"></div>
+                    <div class="contrib-cell contrib-2"></div>
+                    <div class="contrib-cell contrib-4"></div>
+                    <div class="contrib-cell contrib-1"></div>
+                    <div class="contrib-cell contrib-2"></div>
+                    <div class="contrib-cell contrib-1"></div>
+                    <div class="contrib-cell"></div>
+                    <div class="contrib-cell contrib-3"></div>
+                    <div class="contrib-cell contrib-4"></div>
+                    <div class="contrib-cell contrib-2"></div>
+                    <div class="contrib-cell contrib-1"></div>
+                    <div class="contrib-cell contrib-1"></div>
+                    <div class="contrib-cell contrib-2"></div>
+                    <div class="contrib-cell contrib-3"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======== Project Grid ======== -->
+      <section class="section-padding" style="background: var(--brand-muted);">
+        <div class="container-brand px-6 lg:px-8">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+            <!-- Project Card 1: GoFlow -->
+            <div class="card p-5 lg:p-6">
+              <div class="flex items-start gap-4">
+                <!-- Icon Placeholder -->
+                <div class="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center font-serif text-lg font-bold" style="background: #E8F5E9; color: #2E7D32;">
+                  G
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <h3 class="font-code font-semibold text-base truncate" style="color: var(--brand-foreground);">GoFlow</h3>
+                    <span class="badge" style="background: #E8F5E9; color: #2E7D32; font-size: 11px;">活跃维护</span>
+                  </div>
+                  <p class="mt-1.5 text-sm line-clamp-2" style="color: var(--brand-foreground-secondary);">
+                    轻量级 Go 工作流引擎，支持 DAG 任务编排
+                  </p>
+                </div>
+              </div>
+              <div class="mt-4 flex flex-wrap items-center gap-4 text-xs" style="color: var(--brand-foreground-muted);">
+                <span class="flex items-center gap-1.5">
+                  <span class="lang-dot" style="background: #00ADD8;"></span>
+                  Go
+                </span>
+                <span class="flex items-center gap-1">
+                  <i data-lucide="star" class="w-3.5 h-3.5"></i> 3,200
+                </span>
+                <span class="flex items-center gap-1">
+                  <i data-lucide="git-fork" class="w-3.5 h-3.5"></i> 420
+                </span>
+                <span class="flex items-center gap-1">
+                  <i data-lucide="clock" class="w-3.5 h-3.5"></i> 3 天前
+                </span>
+                <span class="badge" style="background: var(--brand-border-light); color: var(--brand-foreground-muted); font-size: 11px;">MIT</span>
+              </div>
+            </div>
+
+            <!-- Project Card 2: config-vault -->
+            <div class="card p-5 lg:p-6">
+              <div class="flex items-start gap-4">
+                <div class="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center font-serif text-lg font-bold" style="background: #E3F2FD; color: #1565C0;">
+                  C
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <h3 class="font-code font-semibold text-base truncate" style="color: var(--brand-foreground);">config-vault</h3>
+                    <span class="badge" style="background: #E8F5E9; color: #2E7D32; font-size: 11px;">活跃维护</span>
+                  </div>
+                  <p class="mt-1.5 text-sm line-clamp-2" style="color: var(--brand-foreground-secondary);">
+                    分布式配置中心，支持多环境管理与热更新
+                  </p>
+                </div>
+              </div>
+              <div class="mt-4 flex flex-wrap items-center gap-4 text-xs" style="color: var(--brand-foreground-muted);">
+                <span class="flex items-center gap-1.5">
+                  <span class="lang-dot" style="background: #00ADD8;"></span>
+                  Go
+                </span>
+                <span class="flex items-center gap-1">
+                  <i data-lucide="star" class="w-3.5 h-3.5"></i> 1,800
+                </span>
+                <span class="flex items-center gap-1">
+                  <i data-lucide="git-fork" class="w-3.5 h-3.5"></i> 210
+                </span>
+                <span class="flex items-center gap-1">
+                  <i data-lucide="clock" class="w-3.5 h-3.5"></i> 1 周前
+                </span>
+                <span class="badge" style="background: var(--brand-border-light); color: var(--brand-foreground-muted); font-size: 11px;">MIT</span>
+              </div>
+            </div>
+
+            <!-- Project Card 3: ts-mock-server -->
+            <div class="card p-5 lg:p-6">
+              <div class="flex items-start gap-4">
+                <div class="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center font-serif text-lg font-bold" style="background: #FFF8E1; color: #F57F17;">
+                  T
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <h3 class="font-code font-semibold text-base truncate" style="color: var(--brand-foreground);">ts-mock-server</h3>
+                    <span class="badge" style="background: #E8F5E9; color: #2E7D32; font-size: 11px;">活跃维护</span>
+                  </div>
+                  <p class="mt-1.5 text-sm line-clamp-2" style="color: var(--brand-foreground-secondary);">
+                    TypeScript Mock 服务，快速搭建 API 模拟
+                  </p>
+                </div>
+              </div>
+              <div class="mt-4 flex flex-wrap items-center gap-4 text-xs" style="color: var(--brand-foreground-muted);">
+                <span class="flex items-center gap-1.5">
+                  <span class="lang-dot" style="background: #F7DF1E;"></span>
+                  TypeScript
+                </span>
+                <span class="flex items-center gap-1">
+                  <i data-lucide="star" class="w-3.5 h-3.5"></i> 1,200
+                </span>
+                <span class="flex items-center gap-1">
+                  <i data-lucide="git-fork" class="w-3.5 h-3.5"></i> 95
+                </span>
+                <span class="flex items-center gap-1">
+                  <i data-lucide="clock" class="w-3.5 h-3.5"></i> 2 周前
+                </span>
+                <span class="badge" style="background: var(--brand-border-light); color: var(--brand-foreground-muted); font-size: 11px;">MIT</span>
+              </div>
+            </div>
+
+            <!-- Project Card 4: log-stream -->
+            <div class="card p-5 lg:p-6">
+              <div class="flex items-start gap-4">
+                <div class="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center font-serif text-lg font-bold" style="background: #E3F2FD; color: #1565C0;">
+                  L
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <h3 class="font-code font-semibold text-base truncate" style="color: var(--brand-foreground);">log-stream</h3>
+                    <span class="badge" style="background: #E3F2FD; color: #1565C0; font-size: 11px;">稳定版</span>
+                  </div>
+                  <p class="mt-1.5 text-sm line-clamp-2" style="color: var(--brand-foreground-secondary);">
+                    实时日志聚合器，支持多源采集与结构化查询
+                  </p>
+                </div>
+              </div>
+              <div class="mt-4 flex flex-wrap items-center gap-4 text-xs" style="color: var(--brand-foreground-muted);">
+                <span class="flex items-center gap-1.5">
+                  <span class="lang-dot" style="background: #00ADD8;"></span>
+                  Go
+                </span>
+                <span class="flex items-center gap-1">
+                  <i data-lucide="star" class="w-3.5 h-3.5"></i> 890
+                </span>
+                <span class="flex items-center gap-1">
+                  <i data-lucide="git-fork" class="w-3.5 h-3.5"></i> 68
+                </span>
+                <span class="flex items-center gap-1">
+                  <i data-lucide="clock" class="w-3.5 h-3.5"></i> 1 月前
+                </span>
+                <span class="badge" style="background: var(--brand-border-light); color: var(--brand-foreground-muted); font-size: 11px;">Apache 2.0</span>
+              </div>
+            </div>
+
+            <!-- Project Card 5: react-charts-warm -->
+            <div class="card p-5 lg:p-6">
+              <div class="flex items-start gap-4">
+                <div class="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center font-serif text-lg font-bold" style="background: #FFF8E1; color: #F57F17;">
+                  R
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <h3 class="font-code font-semibold text-base truncate" style="color: var(--brand-foreground);">react-charts-warm</h3>
+                    <span class="badge" style="background: #E3F2FD; color: #1565C0; font-size: 11px;">稳定版</span>
+                  </div>
+                  <p class="mt-1.5 text-sm line-clamp-2" style="color: var(--brand-foreground-secondary);">
+                    温暖风格的 React 图表库，注重视觉体验
+                  </p>
+                </div>
+              </div>
+              <div class="mt-4 flex flex-wrap items-center gap-4 text-xs" style="color: var(--brand-foreground-muted);">
+                <span class="flex items-center gap-1.5">
+                  <span class="lang-dot" style="background: #F7DF1E;"></span>
+                  TypeScript
+                </span>
+                <span class="flex items-center gap-1">
+                  <i data-lucide="star" class="w-3.5 h-3.5"></i> 650
+                </span>
+                <span class="flex items-center gap-1">
+                  <i data-lucide="git-fork" class="w-3.5 h-3.5"></i> 42
+                </span>
+                <span class="flex items-center gap-1">
+                  <i data-lucide="clock" class="w-3.5 h-3.5"></i> 2 周前
+                </span>
+                <span class="badge" style="background: var(--brand-border-light); color: var(--brand-foreground-muted); font-size: 11px;">MIT</span>
+              </div>
+            </div>
+
+            <!-- Project Card 6: cli-dashboard -->
+            <div class="card p-5 lg:p-6">
+              <div class="flex items-start gap-4">
+                <div class="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center font-serif text-lg font-bold" style="background: #E8F5E9; color: #2E7D32;">
+                  D
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <h3 class="font-code font-semibold text-base truncate" style="color: var(--brand-foreground);">cli-dashboard</h3>
+                    <span class="badge" style="background: #FFF8E1; color: #F57F17; font-size: 11px;">实验性</span>
+                  </div>
+                  <p class="mt-1.5 text-sm line-clamp-2" style="color: var(--brand-foreground-secondary);">
+                    终端数据看板工具，在命令行中构建可视化
+                  </p>
+                </div>
+              </div>
+              <div class="mt-4 flex flex-wrap items-center gap-4 text-xs" style="color: var(--brand-foreground-muted);">
+                <span class="flex items-center gap-1.5">
+                  <span class="lang-dot" style="background: #3572A5;"></span>
+                  Python
+                </span>
+                <span class="flex items-center gap-1">
+                  <i data-lucide="star" class="w-3.5 h-3.5"></i> 420
+                </span>
+                <span class="flex items-center gap-1">
+                  <i data-lucide="git-fork" class="w-3.5 h-3.5"></i> 28
+                </span>
+                <span class="flex items-center gap-1">
+                  <i data-lucide="clock" class="w-3.5 h-3.5"></i> 3 周前
+                </span>
+                <span class="badge" style="background: var(--brand-border-light); color: var(--brand-foreground-muted); font-size: 11px;">MIT</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ======== Contributions Activity Section ======== -->
+      <section class="section-padding">
+        <div class="container-brand px-6 lg:px-8">
+          <div class="card p-6 lg:p-10">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+              <div>
+                <h2 class="font-serif" style="font-size: clamp(22px, 2.8vw, 32px); font-weight: 700; color: var(--brand-foreground); text-wrap: balance;">
+                  开源贡献
+                </h2>
+                <div class="mt-2 flex flex-wrap gap-4 text-sm" style="color: var(--brand-foreground-secondary);">
+                  <span class="flex items-center gap-1.5">
+                    <i data-lucide="flame" class="w-4 h-4" style="color: var(--brand-primary);"></i>
+                    今年贡献 847 次
+                  </span>
+                  <span class="flex items-center gap-1.5">
+                    <i data-lucide="trophy" class="w-4 h-4" style="color: var(--brand-primary);"></i>
+                    最长连续 32 天
+                  </span>
+                </div>
+              </div>
+              <a href="#" class="btn-secondary">
+                <i data-lucide="github" class="w-4 h-4"></i>
+                在 GitHub 上查看
+              </a>
+            </div>
+
+            <!-- GitHub-style Contribution Grid -->
+            <div class="overflow-x-auto no-scrollbar">
+              <div class="flex gap-0.5 min-w-[700px]" aria-label="年度贡献日历">
+                <!-- 52 weeks x 7 days grid -->
+                <!-- Week 1 -->
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-3"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                  <div class="contrib-cell contrib-1"></div>
+                  <div class="contrib-cell contrib-2"></div>
+                  <div class="contrib-cell contrib-4"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Legend -->
+            <div class="mt-4 flex items-center gap-2 text-xs" style="color: var(--brand-foreground-muted);">
+              <span>少</span>
+              <div class="contrib-cell"></div>
+              <div class="contrib-cell contrib-1"></div>
+              <div class="contrib-cell contrib-2"></div>
+              <div class="contrib-cell contrib-3"></div>
+              <div class="contrib-cell contrib-4"></div>
+              <span>多</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======== Open Source Philosophy Card ======== -->
+      <section class="section-padding" style="background: var(--brand-muted);">
+        <div class="container-brand px-6 lg:px-8">
+          <div class="text-center max-w-3xl mx-auto">
+            <div class="inline-block mb-6" style="color: var(--brand-primary);">
+              <i data-lucide="quote" class="w-10 h-10"></i>
+            </div>
+            <blockquote class="font-serif" style="font-size: clamp(20px, 2.6vw, 28px); font-weight: 400; font-style: italic; line-height: 1.8; color: var(--brand-foreground);">
+              开源不仅是分享代码，更是分享思考方式和解决问题的方法论。
+            </blockquote>
+            <p class="mt-6 text-sm" style="color: var(--brand-foreground-muted); letter-spacing: 0.05em;">
+              — 码上行
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======== Footer ======== -->
+      <footer style="background: var(--brand-card); border-top: 1px solid var(--brand-border-light);">
+        <div class="container-brand px-6 lg:px-8 py-12">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Brand Column -->
+            <div class="sm:col-span-2 lg:col-span-1">
+              <h4 class="font-serif text-lg font-bold" style="color: var(--brand-foreground);">码上行</h4>
+              <p class="mt-2 text-sm" style="color: var(--brand-foreground-muted); line-height: 1.7;">
+                用代码构建更好的工具<br>与社区一起进步
+              </p>
+            </div>
+            <!-- Navigation -->
+            <div>
+              <h5 class="text-sm font-semibold mb-3" style="color: var(--brand-foreground-secondary);">导航</h5>
+              <ul class="space-y-2">
+                <li><a href="../pages/index.html" class="text-sm hover:underline" style="color: var(--brand-foreground-muted);">首页</a></li>
+                <li><a href="../pages/blog.html" class="text-sm hover:underline" style="color: var(--brand-foreground-muted);">技术博客</a></li>
+                <li><a href="../pages/courses.html" class="text-sm hover:underline" style="color: var(--brand-foreground-muted);">教学课程</a></li>
+                <li><a href="../pages/projects.html" class="text-sm hover:underline" style="color: var(--brand-foreground-muted);">开源作品</a></li>
+              </ul>
+            </div>
+            <!-- Social -->
+            <div>
+              <h5 class="text-sm font-semibold mb-3" style="color: var(--brand-foreground-secondary);">社交</h5>
+              <ul class="space-y-2">
+                <li><a href="#" class="text-sm hover:underline" style="color: var(--brand-foreground-muted);">GitHub</a></li>
+                <li><a href="#" class="text-sm hover:underline" style="color: var(--brand-foreground-muted);">Twitter / X</a></li>
+                <li><a href="#" class="text-sm hover:underline" style="color: var(--brand-foreground-muted);">掘金</a></li>
+              </ul>
+            </div>
+            <!-- Contact -->
+            <div>
+              <h5 class="text-sm font-semibold mb-3" style="color: var(--brand-foreground-secondary);">联系</h5>
+              <ul class="space-y-2">
+                <li><a href="../pages/about.html" class="text-sm hover:underline" style="color: var(--brand-foreground-muted);">关于我</a></li>
+                <li><a href="#" class="text-sm hover:underline" style="color: var(--brand-foreground-muted);">RSS 订阅</a></li>
+              </ul>
+            </div>
+          </div>
+          <!-- Copyright -->
+          <div class="mt-10 pt-6 text-center text-xs" style="border-top: 1px solid var(--brand-border-light); color: var(--brand-foreground-muted);">
+            &copy; 2026 码上行 (CodeWalker). All rights reserved.
+          </div>
+        </div>
+      </footer>
+
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

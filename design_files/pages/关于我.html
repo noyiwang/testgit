@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关于我 - 码上行</title>
+    <style id="theme-vars">
+:root {
+  --background: #FFFBF5;
+  --foreground: #2D2A26;
+  --card: #FFFFFF;
+  --card-foreground: #2D2A26;
+  --popover: #FFFFFF;
+  --popover-foreground: #2D2A26;
+  --primary: #D97706;
+  --primary-foreground: #FFFFFF;
+  --secondary: #FEF3C7;
+  --secondary-foreground: #92400E;
+  --muted: #F5F0EB;
+  --muted-foreground: #78716C;
+  --accent: #FDE68A;
+  --accent-foreground: #78350F;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+  --border: #E7DDD0;
+  --input: #E7DDD0;
+  --ring: #D97706;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --font-serif: 'Noto Serif SC', 'Georgia', serif;
+  --font-sans: 'Inter', 'Noto Sans SC', system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+.font-serif {
+  font-family: var(--font-serif);
+}
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --radius-sm: var(--radius-sm);
+    --radius-md: var(--radius-md);
+    --radius-lg: var(--radius-lg);
+    --radius-xl: var(--radius-xl);
+  }
+  @layer base {
+    body { background: var(--background); color: var(--foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main>
+
+        <!-- ===== Top Navigation Bar ===== -->
+        <nav class="w-full border-b border-border bg-background">
+            <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                <a href="../pages/index.html" class="font-serif text-xl font-bold text-foreground whitespace-nowrap tracking-tight">码上行</a>
+                <div class="flex items-center gap-1 sm:gap-2">
+                    <a href="../pages/index.html" data-dom-id="nav-index" class="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap rounded-lg hover:bg-muted">首页</a>
+                    <a href="../pages/blog.html" data-dom-id="nav-blog" class="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap rounded-lg hover:bg-muted">博客</a>
+                    <a href="../pages/courses.html" data-dom-id="nav-courses" class="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap rounded-lg hover:bg-muted">课程</a>
+                    <a href="../pages/projects.html" data-dom-id="nav-projects" class="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap rounded-lg hover:bg-muted">项目</a>
+                    <a href="../pages/about.html" data-dom-id="nav-about" class="px-3 py-2 text-sm font-medium text-primary whitespace-nowrap rounded-lg bg-secondary">关于我</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- ===== Hero Section ===== -->
+        <section class="py-16 sm:py-20 lg:py-24 bg-background">
+            <div class="max-w-[720px] mx-auto px-4 sm:px-6 text-center">
+                <img src="../assets/image_0_yi19x4.jpg" alt="码上行" class="w-32 h-32 sm:w-40 sm:h-40 rounded-full object-cover mx-auto mb-6 sm:mb-8 border-4 border-secondary shadow-lg" />
+                <h1 class="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-3" style="text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">码上行</h1>
+                <p class="text-muted-foreground text-base sm:text-lg font-medium mb-2">开源工程师 / 技术写作者 / 终身学习者</p>
+                <p class="font-serif text-muted-foreground text-sm sm:text-base italic mb-8">用代码丈量世界，用文字传递思考</p>
+                <div class="flex items-center justify-center gap-3">
+                    <a href="https://github.com" target="_blank" rel="noopener" class="w-10 h-10 rounded-lg bg-muted hover:bg-secondary transition-colors flex items-center justify-center text-muted-foreground hover:text-primary">
+                        <i data-lucide="github" class="w-5 h-5"></i>
+                    </a>
+                    <a href="https://x.com" target="_blank" rel="noopener" class="w-10 h-10 rounded-lg bg-muted hover:bg-secondary transition-colors flex items-center justify-center text-muted-foreground hover:text-primary">
+                        <i data-lucide="twitter" class="w-5 h-5"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-lg bg-muted hover:bg-secondary transition-colors flex items-center justify-center text-muted-foreground hover:text-primary">
+                        <i data-lucide="message-circle" class="w-5 h-5"></i>
+                    </a>
+                    <a href="https://bilibili.com" target="_blank" rel="noopener" class="w-10 h-10 rounded-lg bg-muted hover:bg-secondary transition-colors flex items-center justify-center text-muted-foreground hover:text-primary">
+                        <i data-lucide="tv" class="w-5 h-5"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-lg bg-muted hover:bg-secondary transition-colors flex items-center justify-center text-muted-foreground hover:text-primary">
+                        <i data-lucide="rss" class="w-5 h-5"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Story / Bio Section ===== -->
+        <section class="py-12 sm:py-16 lg:py-20 bg-muted/50">
+            <div class="max-w-[720px] mx-auto px-4 sm:px-6">
+                <h2 class="font-serif text-2xl sm:text-3xl font-bold text-foreground mb-8 sm:mb-10" style="text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">我的故事</h2>
+                <div class="space-y-5 sm:space-y-6 text-base sm:text-[17px] leading-relaxed sm:leading-loose text-foreground/80">
+                    <p>从第一次在终端里看到 Hello World 开始，我就被代码的力量深深吸引。十年来，从后端开发到分布式系统，从个人项目到开源社区，每一步都让我更加热爱这项事业。</p>
+                    <p>我相信技术的价值在于解决真实的问题。开源让我能够与全球开发者一起协作，而写作则让我能够将复杂的知识转化为可以传递的经验。</p>
+                    <p>「码上行」这个名字，承载着我对技术的态度：保持前行，不断探索，用代码走出自己的路。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Timeline / Career Section ===== -->
+        <section class="py-12 sm:py-16 lg:py-20 bg-background">
+            <div class="max-w-[720px] mx-auto px-4 sm:px-6">
+                <h2 class="font-serif text-2xl sm:text-3xl font-bold text-foreground mb-10 sm:mb-12" style="text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">技术旅程</h2>
+
+                <div class="relative">
+                    <!-- Vertical amber line -->
+                    <div class="absolute left-[19px] sm:left-[23px] top-2 bottom-2 w-0.5 bg-primary/30"></div>
+
+                    <div class="space-y-8 sm:space-y-10">
+                        <!-- Milestone 1 -->
+                        <div class="relative flex gap-4 sm:gap-6">
+                            <div class="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary flex items-center justify-center">
+                                <span class="text-primary-foreground text-xs sm:text-sm font-bold">16</span>
+                            </div>
+                            <div class="pt-1 sm:pt-2 min-w-0">
+                                <span class="font-serif text-primary text-lg sm:text-xl font-bold">2016</span>
+                                <h3 class="text-foreground font-semibold text-base sm:text-lg mt-0.5 truncate">开始编程之旅</h3>
+                                <p class="text-muted-foreground text-sm mt-1 line-clamp-2">接触 Python 和 Web 开发，打开编程世界的大门</p>
+                            </div>
+                        </div>
+
+                        <!-- Milestone 2 -->
+                        <div class="relative flex gap-4 sm:gap-6">
+                            <div class="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary flex items-center justify-center">
+                                <span class="text-primary-foreground text-xs sm:text-sm font-bold">18</span>
+                            </div>
+                            <div class="pt-1 sm:pt-2 min-w-0">
+                                <span class="font-serif text-primary text-lg sm:text-xl font-bold">2018</span>
+                                <h3 class="text-foreground font-semibold text-base sm:text-lg mt-0.5 truncate">深耕后端架构</h3>
+                                <p class="text-muted-foreground text-sm mt-1 line-clamp-2">加入互联网公司，专注高并发系统设计与微服务架构</p>
+                            </div>
+                        </div>
+
+                        <!-- Milestone 3 -->
+                        <div class="relative flex gap-4 sm:gap-6">
+                            <div class="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary flex items-center justify-center">
+                                <span class="text-primary-foreground text-xs sm:text-sm font-bold">20</span>
+                            </div>
+                            <div class="pt-1 sm:pt-2 min-w-0">
+                                <span class="font-serif text-primary text-lg sm:text-xl font-bold">2020</span>
+                                <h3 class="text-foreground font-semibold text-base sm:text-lg mt-0.5 truncate">开启开源之路</h3>
+                                <p class="text-muted-foreground text-sm mt-1 line-clamp-2">开始活跃于开源社区，发布第一个千星项目</p>
+                            </div>
+                        </div>
+
+                        <!-- Milestone 4 -->
+                        <div class="relative flex gap-4 sm:gap-6">
+                            <div class="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary flex items-center justify-center">
+                                <span class="text-primary-foreground text-xs sm:text-sm font-bold">22</span>
+                            </div>
+                            <div class="pt-1 sm:pt-2 min-w-0">
+                                <span class="font-serif text-primary text-lg sm:text-xl font-bold">2022</span>
+                                <h3 class="text-foreground font-semibold text-base sm:text-lg mt-0.5 truncate">独立开发者</h3>
+                                <p class="text-muted-foreground text-sm mt-1 line-clamp-2">成为独立开发者，专注技术教育和开源项目</p>
+                            </div>
+                        </div>
+
+                        <!-- Milestone 5 -->
+                        <div class="relative flex gap-4 sm:gap-6">
+                            <div class="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary flex items-center justify-center">
+                                <span class="text-primary-foreground text-xs sm:text-sm font-bold">24</span>
+                            </div>
+                            <div class="pt-1 sm:pt-2 min-w-0">
+                                <span class="font-serif text-primary text-lg sm:text-xl font-bold">2024</span>
+                                <h3 class="text-foreground font-semibold text-base sm:text-lg mt-0.5 truncate">创建「码上行」品牌</h3>
+                                <p class="text-muted-foreground text-sm mt-1 line-clamp-2">正式创建「码上行」个人技术品牌，全网粉丝突破 10K+</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Skills & Expertise ===== -->
+        <section class="py-12 sm:py-16 lg:py-20 bg-muted/50">
+            <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-10 sm:mb-12">
+                    <h2 class="font-serif text-2xl sm:text-3xl font-bold text-foreground" style="text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">技术栈</h2>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                    <!-- Backend -->
+                    <div class="bg-card rounded-lg border border-border p-6 sm:p-8">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                                <i data-lucide="server" class="w-5 h-5"></i>
+                            </div>
+                            <h3 class="font-serif font-semibold text-lg text-foreground whitespace-nowrap truncate">后端开发</h3>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1.5 text-sm bg-muted text-foreground/80 rounded-lg whitespace-nowrap">Go</span>
+                            <span class="px-3 py-1.5 text-sm bg-muted text-foreground/80 rounded-lg whitespace-nowrap">Python</span>
+                            <span class="px-3 py-1.5 text-sm bg-muted text-foreground/80 rounded-lg whitespace-nowrap">Rust</span>
+                            <span class="px-3 py-1.5 text-sm bg-muted text-foreground/80 rounded-lg whitespace-nowrap">PostgreSQL</span>
+                            <span class="px-3 py-1.5 text-sm bg-muted text-foreground/80 rounded-lg whitespace-nowrap">Redis</span>
+                        </div>
+                    </div>
+
+                    <!-- Frontend -->
+                    <div class="bg-card rounded-lg border border-border p-6 sm:p-8">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                                <i data-lucide="layout" class="w-5 h-5"></i>
+                            </div>
+                            <h3 class="font-serif font-semibold text-lg text-foreground whitespace-nowrap truncate">前端开发</h3>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1.5 text-sm bg-muted text-foreground/80 rounded-lg whitespace-nowrap">TypeScript</span>
+                            <span class="px-3 py-1.5 text-sm bg-muted text-foreground/80 rounded-lg whitespace-nowrap">React</span>
+                            <span class="px-3 py-1.5 text-sm bg-muted text-foreground/80 rounded-lg whitespace-nowrap">Vue</span>
+                            <span class="px-3 py-1.5 text-sm bg-muted text-foreground/80 rounded-lg whitespace-nowrap">Next.js</span>
+                        </div>
+                    </div>
+
+                    <!-- DevOps -->
+                    <div class="bg-card rounded-lg border border-border p-6 sm:p-8">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                                <i data-lucide="cloud" class="w-5 h-5"></i>
+                            </div>
+                            <h3 class="font-serif font-semibold text-lg text-foreground whitespace-nowrap truncate">DevOps</h3>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1.5 text-sm bg-muted text-foreground/80 rounded-lg whitespace-nowrap">Docker</span>
+                            <span class="px-3 py-1.5 text-sm bg-muted text-foreground/80 rounded-lg whitespace-nowrap">Kubernetes</span>
+                            <span class="px-3 py-1.5 text-sm bg-muted text-foreground/80 rounded-lg whitespace-nowrap">CI/CD</span>
+                            <span class="px-3 py-1.5 text-sm bg-muted text-foreground/80 rounded-lg whitespace-nowrap">AWS</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Philosophy Section ===== -->
+        <section class="py-12 sm:py-16 lg:py-20 bg-background">
+            <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-10 sm:mb-12">
+                    <h2 class="font-serif text-2xl sm:text-3xl font-bold text-foreground" style="text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">技术理念</h2>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                    <!-- Card 1 -->
+                    <div class="bg-card rounded-lg border border-border p-6 sm:p-8 text-center">
+                        <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-secondary mx-auto mb-5 flex items-center justify-center text-primary">
+                            <i data-lucide="pen-tool" class="w-7 h-7"></i>
+                        </div>
+                        <h3 class="font-serif text-lg sm:text-xl font-semibold text-foreground mb-3 whitespace-nowrap">代码即表达</h3>
+                        <p class="text-muted-foreground text-sm leading-relaxed">好的代码应该像好的文章一样清晰易懂</p>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="bg-card rounded-lg border border-border p-6 sm:p-8 text-center">
+                        <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-secondary mx-auto mb-5 flex items-center justify-center text-primary">
+                            <i data-lucide="users" class="w-7 h-7"></i>
+                        </div>
+                        <h3 class="font-serif text-lg sm:text-xl font-semibold text-foreground mb-3 whitespace-nowrap">开源即学习</h3>
+                        <p class="text-muted-foreground text-sm leading-relaxed">与社区协作是提升技术视野的最佳方式</p>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="bg-card rounded-lg border border-border p-6 sm:p-8 text-center">
+                        <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-secondary mx-auto mb-5 flex items-center justify-center text-primary">
+                            <i data-lucide="book-open" class="w-7 h-7"></i>
+                        </div>
+                        <h3 class="font-serif text-lg sm:text-xl font-semibold text-foreground mb-3 whitespace-nowrap">分享即成长</h3>
+                        <p class="text-muted-foreground text-sm leading-relaxed">教学相长，写作是最好的深度学习</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Contact / CTA Section ===== -->
+        <section class="py-12 sm:py-16 lg:py-20 bg-muted/50">
+            <div class="max-w-[720px] mx-auto px-4 sm:px-6 text-center">
+                <h2 class="font-serif text-2xl sm:text-3xl font-bold text-foreground mb-3" style="text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">与我联系</h2>
+                <p class="text-muted-foreground text-base mb-8 sm:mb-10">无论是技术交流、项目合作还是课程咨询，欢迎随时联系</p>
+
+                <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-10 sm:mb-12">
+                    <a href="https://github.com" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-5 py-2.5 bg-card border border-border rounded-lg text-sm font-medium text-foreground hover:bg-secondary hover:border-primary/30 transition-colors whitespace-nowrap">
+                        <i data-lucide="github" class="w-4 h-4"></i>
+                        GitHub
+                    </a>
+                    <a href="mailto:maxhang@example.com" class="inline-flex items-center gap-2 px-5 py-2.5 bg-card border border-border rounded-lg text-sm font-medium text-foreground hover:bg-secondary hover:border-primary/30 transition-colors whitespace-nowrap">
+                        <i data-lucide="mail" class="w-4 h-4"></i>
+                        Email
+                    </a>
+                    <a href="#" class="inline-flex items-center gap-2 px-5 py-2.5 bg-card border border-border rounded-lg text-sm font-medium text-foreground hover:bg-secondary hover:border-primary/30 transition-colors whitespace-nowrap">
+                        <i data-lucide="qr-code" class="w-4 h-4"></i>
+                        微信
+                    </a>
+                </div>
+
+                <!-- Subscribe CTA -->
+                <div class="bg-card rounded-lg border border-border p-6 sm:p-8 max-w-[480px] mx-auto">
+                    <h3 class="font-serif text-lg font-semibold text-foreground mb-2">订阅技术周刊</h3>
+                    <p class="text-muted-foreground text-sm mb-4">每周精选技术文章、开源项目和行业洞察</p>
+                    <div class="flex gap-2">
+                        <input type="email" placeholder="your@email.com" class="flex-1 min-w-0 px-4 py-2.5 text-sm bg-muted border border-border rounded-lg text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+                        <button class="px-5 py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-lg hover:bg-primary/90 transition-colors whitespace-nowrap">订阅</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Footer ===== -->
+        <footer class="border-t border-border bg-background py-10 sm:py-12">
+            <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-2">
+                        <span class="font-serif text-lg font-bold text-foreground">码上行</span>
+                        <span class="text-muted-foreground text-sm">CodeWalker</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <a href="https://github.com" target="_blank" rel="noopener" class="text-muted-foreground hover:text-primary transition-colors">
+                            <i data-lucide="github" class="w-5 h-5"></i>
+                        </a>
+                        <a href="https://x.com" target="_blank" rel="noopener" class="text-muted-foreground hover:text-primary transition-colors">
+                            <i data-lucide="twitter" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="text-muted-foreground hover:text-primary transition-colors">
+                            <i data-lucide="rss" class="w-5 h-5"></i>
+                        </a>
+                    </div>
+                    <p class="text-muted-foreground text-xs whitespace-nowrap">&copy; 2024 码上行. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>
