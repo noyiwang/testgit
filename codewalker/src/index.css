@@ -199,11 +199,6 @@
     @apply w-px h-5 mx-1.5 shrink-0 bg-border;
   }
 
-  .line-gutter {
-    @apply font-mono text-[13px] leading-[1.7] text-right select-none py-4 px-3 min-w-12 shrink-0 overflow-hidden;
-    color: rgb(from var(--brand-muted-foreground) r g b / 0.5);
-  }
-
   .md-textarea {
     @apply bg-transparent text-code-text font-mono text-sm leading-[1.7] resize-none outline-none border-none w-full h-full p-4;
     tab-size: 4;
@@ -276,6 +271,24 @@
   }
   .preview-content li {
     @apply mb-1;
+  }
+  .preview-content del {
+    @apply text-muted-foreground line-through;
+  }
+  .preview-content input[type="checkbox"] {
+    @apply mr-2 w-4 h-4 accent-primary;
+  }
+  .preview-content a {
+    @apply text-primary underline underline-offset-2 transition-colors hover:text-amber-dark;
+  }
+  .preview-content img {
+    @apply max-w-full rounded-large my-4;
+  }
+  .line-gutter {
+    @apply font-mono text-[13px] leading-[1.7] text-right select-none py-4 px-3 min-w-12 shrink-0 overflow-hidden;
+    color: rgba(245, 230, 211, 0.3);
+    padding-top: 1rem;
+    padding-bottom: 1rem;
   }
 }
 

@@ -1,13 +1,28 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { marked } from 'marked'
-import { ArrowLeft, Bold, Italic, Link2, List, ListOrdered, Code, Quote, Image, Eye, EyeOff, Save, Send, X, ChevronLeft, ChevronRight, FileText } from 'lucide-react'
+import {
+  ArrowLeft, Bold, Italic, Strikethrough, Link2, List, ListOrdered, ListChecks, Code,
+  FileCode2, Quote, Image, Table, Minus, Eye, EyeOff, Save, Send, X,
+  FileText, Trash2, Clock, Type
+} from 'lucide-react'
 import AdminNavbar from '../components/AdminNavbar'
 import { adminArticleAPI, mockData } from '../services/api'
+
+const renderer = new marked.Renderer()
+const originalListitem = renderer.listitem.bind(renderer)
+renderer.listitem = function(text, task, checked) {
+  if (task) {
+    const checkbox = `<input type="checkbox" ${checked ? 'checked' : ''} disabled onclick="return false" />`
+    return `<li class="task-list-item" style="list-style:none">${checkbox}${text}</li>`
+  }
+  return originalListitem(text, task, checked)
+}
 
 marked.setOptions({
   breaks: true,
   gfm: true,
+  renderer,
 })
 
 const defaultContent = `## 开始写作
@@ -18,6 +33,7 @@ const defaultContent = `## 开始写作
 
 - **粗体文字** 使用 \`**文字**\`
 - *斜体文字* 使用 \`*文字*\`
+- ~~删除线~~ 使用 \`~~文字~~\`
 - [链接文字](https://example.com) 使用 \`[文字](url)\`
 - 代码块使用三个反引号包围
 
@@ -25,6 +41,9 @@ const defaultContent = `## 开始写作
 
 1. 有序列表项
 2. 第二项
+
+- [ ] 任务列表未完成
+- [x] 任务列表已完成
 
 | 标题 | 描述 |
 |------|------|
@@ -35,7 +54,7 @@ const defaultContent = `## 开始写作
 祝您写作愉快！
 `
 
-const categories = ['技术', '随笔', '教程', '生活', 'AI', '其他']
+const categories = ['分布式系统', '前端工程', 'Go语言', '开源实践', '云原生', '架构设计']
 
 function ArticleEditor() {
   const navigate = useNavigate()
@@ -44,18 +63,20 @@ function ArticleEditor() {
 
   const textareaRef = useRef(null)
   const lineGutterRef = useRef(null)
-  const editorRef = useRef(null)
-  const previewRef = useRef(null)
+  const autoSaveTimerRef = useRef(null)
 
   const [loading, setLoading] = useState(isEdit)
   const [saving, setSaving] = useState(false)
   const [mobileView, setMobileView] = useState('split')
+  const [lastSaved, setLastSaved] = useState(null)
+  const [lineCount, setLineCount] = useState(1)
+  const [articleId, setArticleId] = useState(null)
 
   const [title, setTitle] = useState('')
   const [slug, setSlug] = useState('')
   const [content, setContent] = useState(defaultContent)
   const [summary, setSummary] = useState('')
-  const [category, setCategory] = useState('技术')
+  const [category, setCategory] = useState('分布式系统')
   const [tags, setTags] = useState([])
   const [tagInput, setTagInput] = useState('')
   const [cover, setCover] = useState('')
@@ -68,12 +89,17 @@ function ArticleEditor() {
 
   const [wordCount, setWordCount] = useState(0)
   const [readTime, setReadTime] = useState(0)
+  const [charCount, setCharCount] = useState(0)
 
   const [unsavedChanges, setUnsavedChanges] = useState(false)
 
   useEffect(() => {
     const words = content.replace(/\s/g, '').length
+    const chars = content.length
+    const lines = content.split('\n').length
     setWordCount(words)
+    setCharCount(chars)
+    setLineCount(lines)
     setReadTime(Math.max(1, Math.ceil(words / 300)))
   }, [content])
 
@@ -85,12 +111,13 @@ function ArticleEditor() {
         setSlug(article.slug)
         setContent(article.content || defaultContent)
         setSummary(article.summary || '')
-        setCategory(article.category || '技术')
+        setCategory(article.category || '分布式系统')
         setTags(article.tags ? article.tags.split(',').map(t => t.trim()) : [])
         setCover(article.cover || '')
         setIsPinned(article.is_pinned || false)
         setAllowComments(article.allow_comments !== false)
         setPublishedAt(article.published_at ? article.published_at.split('T')[0] : '')
+        setArticleId(parseInt(id))
       }
       setLoading(false)
     }
@@ -113,7 +140,23 @@ function ArticleEditor() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
   }, [unsavedChanges])
 
-  const insertMarkdown = (before, after = '', placeholder = '') => {
+  useEffect(() => {
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current)
+    }
+    if (unsavedChanges && title.trim()) {
+      autoSaveTimerRef.current = setTimeout(() => {
+        handleAutoSave()
+      }, 30000)
+    }
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current)
+      }
+    }
+  }, [content, title, unsavedChanges])
+
+  const insertMarkdown = useCallback((before, after = '', placeholder = '', block = false) => {
     const textarea = textareaRef.current
     if (!textarea) return
 
@@ -121,15 +164,61 @@ function ArticleEditor() {
     const end = textarea.selectionEnd
     const selectedText = content.substring(start, end)
     const textToInsert = selectedText || placeholder
-    const newContent = content.substring(0, start) + before + textToInsert + after + content.substring(end)
+
+    let insertBefore = before
+    let insertAfter = after
+    let cursorOffset = 0
+
+    if (block) {
+      const beforeChar = start > 0 ? content[start - 1] : '\n'
+      if (beforeChar !== '\n') {
+        insertBefore = '\n' + insertBefore
+        cursorOffset += 1
+      }
+      const afterChar = end < content.length ? content[end] : '\n'
+      if (afterChar !== '\n') {
+        insertAfter = insertAfter + '\n'
+      }
+    }
+
+    const newContent = content.substring(0, start) + insertBefore + textToInsert + insertAfter + content.substring(end)
     setContent(newContent)
     setUnsavedChanges(true)
 
     setTimeout(() => {
       textarea.focus()
-      const newCursorPos = start + before.length + textToInsert.length
+      const newCursorPos = start + insertBefore.length + textToInsert.length + cursorOffset
       textarea.setSelectionRange(newCursorPos, newCursorPos)
+      updateLineNumbers(textarea)
     }, 0)
+  }, [content])
+
+  const insertHeading = () => {
+    insertMarkdown('## ', '', '标题', true)
+  }
+
+  const insertStrikethrough = () => {
+    insertMarkdown('~~', '~~', '删除线文字')
+  }
+
+  const insertTaskList = () => {
+    insertMarkdown('- [ ] ', '', '任务项', true)
+  }
+
+  const insertInlineCode = () => {
+    insertMarkdown('`', '`', '代码')
+  }
+
+  const insertCodeBlock = () => {
+    insertMarkdown('\n```\n', '\n```\n', '代码', false)
+  }
+
+  const insertTable = () => {
+    insertMarkdown('| 列1 | 列2 | 列3 |\n|------|------|------|\n| 内容 | 内容 | 内容 |', '', '', true)
+  }
+
+  const insertHr = () => {
+    insertMarkdown('\n---\n', '', '', false)
   }
 
   const handleInputChange = (e) => {
@@ -138,11 +227,27 @@ function ArticleEditor() {
     updateLineNumbers(e.target)
   }
 
+  const handleTabKey = (e) => {
+    if (e.key === 'Tab') {
+      e.preventDefault()
+      const textarea = e.target
+      const start = textarea.selectionStart
+      const end = textarea.selectionEnd
+      const newContent = content.substring(0, start) + '    ' + content.substring(end)
+      setContent(newContent)
+      setUnsavedChanges(true)
+      setTimeout(() => {
+        textarea.selectionStart = textarea.selectionEnd = start + 4
+      }, 0)
+    }
+  }
+
   const updateLineNumbers = (el) => {
     if (!el || !lineGutterRef.current) return
     const lines = el.value.split('\n').length
     const gutterContent = Array.from({ length: lines }, (_, i) => i + 1).join('\n')
     lineGutterRef.current.textContent = gutterContent
+    setLineCount(lines)
   }
 
   useEffect(() => {
@@ -169,6 +274,13 @@ function ArticleEditor() {
     }
   }
 
+  const addExistingTag = (tag) => {
+    if (!tags.includes(tag) && tags.length < 10) {
+      setTags([...tags, tag])
+      setUnsavedChanges(true)
+    }
+  }
+
   const removeTag = (tagToRemove) => {
     setTags(tags.filter(t => t !== tagToRemove))
     setUnsavedChanges(true)
@@ -178,7 +290,7 @@ function ArticleEditor() {
     title,
     slug: slug || title.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-').replace(/(^-|-$)/g, ''),
     content,
-    summary: summary || content.replace(/[#*`>\[\]()\-_!]/g, '').slice(0, 200),
+    summary: summary || content.replace(/[#*`>\[\]()\-_!~|]/g, '').slice(0, 200),
     category,
     tags: tags.join(','),
     cover,
@@ -187,6 +299,26 @@ function ArticleEditor() {
     word_count: wordCount,
     read_time: readTime,
   })
+
+  const handleAutoSave = async () => {
+    if (!title.trim()) return
+    try {
+      const data = getFormData()
+      data.status = 0
+      if (articleId) {
+        await adminArticleAPI.update(articleId, data)
+      } else {
+        const result = await adminArticleAPI.create(data)
+        if (result && result.id) {
+          setArticleId(result.id)
+        }
+      }
+      setLastSaved(new Date())
+      setUnsavedChanges(false)
+    } catch (e) {
+      console.error('Auto save failed:', e)
+    }
+  }
 
   const handleSave = async (status = 0) => {
     if (!title.trim()) {
@@ -197,12 +329,22 @@ function ArticleEditor() {
     const data = getFormData()
     data.status = status
 
+    if (status === 1 && publishedAt) {
+      data.published_at = publishedAt
+    } else if (status === 1 && !publishedAt) {
+      data.published_at = new Date().toISOString().split('T')[0]
+    }
+
     try {
-      if (isEdit) {
-        await adminArticleAPI.update(id, data)
+      if (articleId) {
+        await adminArticleAPI.update(articleId, data)
       } else {
-        await adminArticleAPI.create(data)
+        const result = await adminArticleAPI.create(data)
+        if (result && result.id) {
+          setArticleId(result.id)
+        }
       }
+      setLastSaved(new Date())
       setUnsavedChanges(false)
       if (status === 1) {
         navigate('/admin/articles')
@@ -213,6 +355,55 @@ function ArticleEditor() {
     setSaving(false)
   }
 
+  const handleDelete = async () => {
+    if (!isEdit || !articleId) {
+      if (confirm('确定要清空当前编辑内容吗？')) {
+        setTitle('')
+        setSlug('')
+        setContent(defaultContent)
+        setSummary('')
+        setTags([])
+        setCover('')
+        setIsPinned(false)
+        setAllowComments(true)
+        setPublishedAt('')
+        setUnsavedChanges(false)
+      }
+      return
+    }
+    if (confirm('确定要永久删除这篇文章吗？此操作不可撤销！')) {
+      await adminArticleAPI.delete(articleId)
+      navigate('/admin/articles')
+    }
+  }
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
+        switch (e.key.toLowerCase()) {
+          case 'b':
+            e.preventDefault()
+            insertMarkdown('**', '**', '粗体文字')
+            break
+          case 'i':
+            e.preventDefault()
+            insertMarkdown('*', '*', '斜体文字')
+            break
+          case 's':
+            e.preventDefault()
+            handleSave(0)
+            break
+          case 'k':
+            e.preventDefault()
+            insertMarkdown('[', '](https://)', '链接文字')
+            break
+        }
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [insertMarkdown, content, title])
+
   const renderMarkdown = (text) => {
     try {
       return marked.parse(text)
@@ -221,21 +412,20 @@ function ArticleEditor() {
     }
   }
 
-  const toolbarButtons = [
-    { icon: Bold, action: () => insertMarkdown('**', '**', '粗体文字'), title: '粗体' },
-    { icon: Italic, action: () => insertMarkdown('*', '*', '斜体文字'), title: '斜体' },
-    { icon: Link2, action: () => insertMarkdown('[', '](https://)', '链接文字'), title: '链接' },
-    { divider: true },
-    { icon: List, action: () => insertMarkdown('- ', '', '列表项'), title: '无序列表' },
-    { icon: ListOrdered, action: () => insertMarkdown('1. ', '', '列表项'), title: '有序列表' },
-    { icon: Quote, action: () => insertMarkdown('> ', '', '引用内容'), title: '引用' },
-    { icon: Code, action: () => insertMarkdown('\n```\n', '\n```\n', '代码'), title: '代码块' },
-    { icon: Image, action: () => insertMarkdown('![', '](https://)', '图片描述'), title: '图片' },
-  ]
+  const existingTags = ['Go', 'Kubernetes', '分布式', 'React', 'TypeScript', '微服务', 'Rust', 'Docker', '并发编程', '云原生', 'gRPC', '架构设计', '开源', '性能优化', 'DevOps']
+    .filter(t => !tags.includes(t))
+
+  const formatLastSaved = () => {
+    if (!lastSaved) return '未保存'
+    const diff = Math.floor((new Date() - lastSaved) / 1000)
+    if (diff < 60) return '刚刚自动保存'
+    if (diff < 3600) return `${Math.floor(diff / 60)}分钟前自动保存`
+    return lastSaved.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) + ' 保存'
+  }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-cream flex items-center justify-center">
+      <div className="h-screen bg-cream flex items-center justify-center">
         <p className="text-muted-foreground">加载中...</p>
       </div>
     )
@@ -245,76 +435,100 @@ function ArticleEditor() {
     <div className="h-screen flex flex-col bg-cream overflow-hidden">
       <AdminNavbar />
 
-      <header className="flex items-center gap-2 sm:gap-3 px-3 sm:px-6 py-3 border-b border-warm-border bg-white shrink-0">
+      <header className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 border-b-2 border-amber bg-white shrink-0">
         <button
           onClick={() => {
             if (unsavedChanges && !confirm('有未保存的更改，确定要离开吗？')) return
             navigate('/admin/articles')
           }}
-          className="p-2 rounded-lg text-muted-foreground transition-colors hover:bg-cream-dark shrink-0"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground shrink-0 p-2 rounded-lg hover:bg-cream-dark"
+          title="返回文章管理"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-4 h-4" />
+          <span className="hidden sm:inline">返回文章管理</span>
         </button>
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 max-w-3xl mx-2 sm:mx-4 min-w-0">
           <input
             type="text"
-            placeholder="输入文章标题..."
-            className="w-full bg-transparent text-lg sm:text-xl font-serif font-bold outline-none text-brown-dark placeholder:text-muted-foreground/50"
+            placeholder="在此输入文章标题..."
+            className="w-full text-center text-base sm:text-lg font-serif font-bold bg-transparent outline-none text-brown-dark placeholder:text-muted-foreground/50"
             value={title}
             onChange={(e) => { setTitle(e.target.value); setUnsavedChanges(true) }}
+            autoFocus
           />
         </div>
-        <div className="hidden md:flex items-center gap-2 shrink-0">
-          <button className="bulk-action-btn" onClick={() => setSidebarOpen(!sidebarOpen)} title="文章设置">
-            <FileText className="w-4 h-4" />
-            <span className="hidden sm:inline">设置</span>
-          </button>
-          <div className="w-px h-5 bg-warm-border mx-1"></div>
+        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
           <button
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground transition-colors hover:bg-cream-dark whitespace-nowrap disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border border-warm-border text-brown-light bg-transparent transition-colors hover:bg-cream-dark whitespace-nowrap disabled:opacity-50"
             onClick={() => handleSave(0)}
             disabled={saving}
+            title="保存草稿 (Ctrl+S)"
           >
-            <Save className="w-4 h-4" />
-            <span>保存草稿</span>
+            <Save className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">保存草稿</span>
           </button>
           <button
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-amber transition-opacity hover:opacity-90 whitespace-nowrap disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg text-sm font-semibold text-white bg-amber transition-opacity hover:opacity-90 whitespace-nowrap disabled:opacity-50"
             onClick={() => handleSave(1)}
             disabled={saving}
           >
-            <Send className="w-4 h-4" />
-            <span>发布</span>
+            <Send className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">发布</span>
           </button>
         </div>
-        <button
-          className="md:hidden p-2 rounded-lg text-muted-foreground transition-colors hover:bg-cream-dark"
-          onClick={() => setMobileView(mobileView === 'split' ? 'editor' : mobileView === 'editor' ? 'preview' : 'split')}
-        >
-          {mobileView === 'preview' ? <Code className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-        </button>
       </header>
 
-      <div className="hidden md:flex items-center gap-0.5 px-2 sm:px-4 py-2 border-b border-warm-border bg-white shrink-0 overflow-x-auto no-scrollbar">
-        {toolbarButtons.map((btn, idx) =>
-          btn.divider ? (
-            <div key={idx} className="toolbar-divider" />
-          ) : (
-            <button
-              key={idx}
-              className="editor-tool-btn"
-              title={btn.title}
-              onClick={btn.action}
-            >
-              <btn.icon className="w-4 h-4" />
-            </button>
-          )
-        )}
-        <div className="flex-1"></div>
+      <div className="hidden md:flex items-center gap-0.5 px-2 sm:px-3 py-1.5 border-b border-warm-border bg-white shrink-0 overflow-x-auto no-scrollbar">
+        <button className="editor-tool-btn font-bold" title="加粗 (Ctrl+B)" onClick={() => insertMarkdown('**', '**', '粗体文字')}>B</button>
+        <button className="editor-tool-btn italic" title="斜体 (Ctrl+I)" onClick={() => insertMarkdown('*', '*', '斜体文字')}>I</button>
+        <button className="editor-tool-btn" title="标题" onClick={insertHeading} style={{ fontFamily: 'Georgia, serif', fontWeight: 700 }}>H</button>
+        <button className="editor-tool-btn line-through" title="删除线" onClick={insertStrikethrough}>S</button>
+
+        <div className="toolbar-divider" />
+
+        <button className="editor-tool-btn" title="无序列表" onClick={() => insertMarkdown('- ', '', '列表项', true)}>
+          <List className="w-4 h-4" />
+        </button>
+        <button className="editor-tool-btn" title="有序列表" onClick={() => insertMarkdown('1. ', '', '列表项', true)}>
+          <ListOrdered className="w-4 h-4" />
+        </button>
+        <button className="editor-tool-btn" title="任务列表" onClick={insertTaskList}>
+          <ListChecks className="w-4 h-4" />
+        </button>
+
+        <div className="toolbar-divider" />
+
+        <button className="editor-tool-btn font-mono text-xs" title="行内代码" onClick={insertInlineCode}>{'<> '}</button>
+        <button className="editor-tool-btn" title="代码块" onClick={insertCodeBlock}>
+          <FileCode2 className="w-4 h-4" />
+        </button>
+        <button className="editor-tool-btn" title="引用块" onClick={() => insertMarkdown('> ', '', '引用内容', true)}>
+          <Quote className="w-4 h-4" />
+        </button>
+
+        <div className="toolbar-divider" />
+
+        <button className="editor-tool-btn" title="链接 (Ctrl+K)" onClick={() => insertMarkdown('[', '](https://)', '链接文字')}>
+          <Link2 className="w-4 h-4" />
+        </button>
+        <button className="editor-tool-btn" title="图片" onClick={() => insertMarkdown('![', '](https://)', '图片描述')}>
+          <Image className="w-4 h-4" />
+        </button>
+        <button className="editor-tool-btn" title="表格" onClick={insertTable}>
+          <Table className="w-4 h-4" />
+        </button>
+
+        <div className="toolbar-divider" />
+
+        <button className="editor-tool-btn" title="分割线" onClick={insertHr}>
+          <Minus className="w-4 h-4" />
+        </button>
+
+        <div className="flex-1" />
         <button
           className={`editor-tool-btn ${showPreview ? 'active' : ''}`}
           onClick={() => setShowPreview(!showPreview)}
-          title="预览"
+          title={showPreview ? '隐藏预览' : '显示预览'}
         >
           {showPreview ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
         </button>
@@ -322,22 +536,22 @@ function ArticleEditor() {
 
       <div className="flex flex-1 min-h-0 overflow-hidden">
         <div className={`flex-1 flex min-w-0 ${mobileView === 'preview' ? 'hidden md:flex' : ''}`}>
-          <div className="flex-1 flex flex-col min-w-0" ref={editorRef}>
+          <div className="flex-1 flex flex-col min-w-0">
             <div className="flex-1 flex min-h-0 overflow-hidden">
               <div
                 ref={lineGutterRef}
                 className="line-gutter overflow-hidden bg-code-sidebar"
-                style={{ lineHeight: '1.7', paddingTop: '1rem', paddingBottom: '1rem' }}
               >
                 1
               </div>
-              <div className="flex-1 overflow-hidden">
+              <div className="flex-1 overflow-hidden bg-code-bg">
                 <textarea
                   ref={textareaRef}
                   className="md-textarea"
                   value={content}
                   onChange={handleInputChange}
                   onScroll={handleScroll}
+                  onKeyDown={handleTabKey}
                   placeholder="在这里开始写作，支持 Markdown 语法..."
                   spellCheck={false}
                 />
@@ -347,24 +561,24 @@ function ArticleEditor() {
         </div>
 
         {showPreview && (mobileView === 'split' || mobileView === 'preview') && (
-          <div className={`${mobileView === 'editor' ? 'hidden' : 'flex'} flex-col md:w-[420px] lg:w-[480px] border-l border-warm-border bg-white overflow-hidden`} ref={previewRef}>
-            <div className="flex items-center justify-between px-5 py-3 border-b border-warm-border shrink-0">
+          <div className={`${mobileView === 'editor' ? 'hidden' : 'flex'} flex-col md:w-[40%] min-w-[320px] lg:min-w-[400px] border-l border-warm-border bg-white overflow-hidden`}>
+            <div className="flex items-center justify-between px-4 py-2 border-b border-warm-border shrink-0">
               <div className="flex items-center gap-2">
-                <Eye className="w-4 h-4 text-amber" />
-                <span className="text-sm font-semibold text-brown-dark">预览</span>
+                <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+                <span className="text-xs font-semibold tracking-wide uppercase text-muted-foreground">预览</span>
               </div>
               <div className="text-xs text-muted-foreground">
-                {wordCount} 字 · {readTime} 分钟阅读
+                {wordCount} 字
               </div>
             </div>
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-6 lg:p-8">
               {title && (
                 <h1 className="font-serif text-2xl sm:text-3xl font-bold text-brown-dark mb-4 leading-tight">
                   {title}
                 </h1>
               )}
               <div
-                className="preview-content"
+                className="preview-content max-w-none"
                 dangerouslySetInnerHTML={{ __html: renderMarkdown(content) }}
               />
             </div>
@@ -421,12 +635,25 @@ function ArticleEditor() {
               </div>
               <input
                 type="text"
-                className="sidebar-input"
+                className="sidebar-input mb-2"
                 placeholder="输入标签按回车添加"
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={handleAddTag}
               />
+              {existingTags.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {existingTags.slice(0, 6).map(tag => (
+                    <button
+                      key={tag}
+                      className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-warm-gray text-muted-foreground hover:bg-amber/10 hover:text-amber-dark transition-colors"
+                      onClick={() => addExistingTag(tag)}
+                    >
+                      + {tag}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div>
@@ -437,7 +664,9 @@ function ArticleEditor() {
                 placeholder="文章摘要（自动生成）"
                 value={summary}
                 onChange={(e) => { setSummary(e.target.value); setUnsavedChanges(true) }}
+                maxLength={200}
               />
+              <div className="text-right text-xs mt-1 text-muted-foreground">{summary.length}/200</div>
             </div>
 
             <div>
@@ -484,41 +713,84 @@ function ArticleEditor() {
                 <span className="text-sm text-brown-dark">允许评论</span>
               </label>
             </div>
+
+            <div className="pt-4 border-t border-warm-border">
+              <h4 className="text-xs font-bold tracking-wide uppercase mb-3 text-red-diff">危险操作</h4>
+              <button
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-red-diff border border-red-diff/30 bg-red-bg transition-colors hover:bg-red-diff hover:text-white"
+                onClick={handleDelete}
+              >
+                <Trash2 className="w-4 h-4" />
+                {isEdit ? '删除文章' : '清空内容'}
+              </button>
+              {isEdit && (
+                <p className="text-xs mt-2 text-muted-foreground">删除后文章将无法恢复，请谨慎操作。</p>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="hidden md:flex items-center justify-between px-4 py-2 border-t border-warm-border bg-white text-xs text-muted-foreground shrink-0">
+      <div className="hidden md:flex items-center justify-between px-4 py-2 border-t border-warm-border bg-white text-xs shrink-0">
         <div className="flex items-center gap-4">
-          <span>{wordCount} 字</span>
-          <span>{readTime} 分钟阅读</span>
-          {unsavedChanges && <span className="text-amber-dark">● 未保存</span>}
+          <div className="flex items-center gap-1 text-muted-foreground">
+            <Type className="w-3 h-3" />
+            <span>{wordCount} 字</span>
+          </div>
+          <div className="flex items-center gap-1 text-muted-foreground">
+            <span>{charCount} 字符</span>
+          </div>
+          <div className="flex items-center gap-1 text-muted-foreground">
+            <Clock className="w-3 h-3" />
+            <span>{readTime} 分钟阅读</span>
+          </div>
+          {unsavedChanges ? (
+            <span className="text-amber-dark flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-dark animate-pulse" />
+              未保存
+            </span>
+          ) : lastSaved ? (
+            <span className="text-green-diff flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-diff" />
+              {formatLastSaved()}
+            </span>
+          ) : null}
         </div>
-        <div className="flex items-center gap-2">
-          <span>Markdown</span>
-          <ChevronRight className="w-4 h-4" />
-          <span>实时预览</span>
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <span className="px-1.5 py-0.5 rounded bg-muted font-mono text-[10px]">Ctrl+B</span>
+          <span>加粗</span>
+          <span className="px-1.5 py-0.5 rounded bg-muted font-mono text-[10px]">Ctrl+I</span>
+          <span>斜体</span>
+          <span className="px-1.5 py-0.5 rounded bg-muted font-mono text-[10px]">Ctrl+S</span>
+          <span>保存</span>
         </div>
       </div>
 
       <div className="md:hidden flex items-center justify-around py-2 border-t border-warm-border bg-white shrink-0">
         <button
-          className="flex flex-col items-center gap-1 px-4 py-1 text-muted-foreground"
+          className="flex flex-col items-center gap-1 px-4 py-1 text-muted-foreground transition-colors hover:text-amber-dark"
           onClick={() => handleSave(0)}
           disabled={saving}
         >
           <Save className="w-5 h-5" />
-          <span className="text-xs">保存草稿</span>
+          <span className="text-xs">保存</span>
         </button>
         <button
-          className="flex flex-col items-center gap-1 px-4 py-1 text-muted-foreground"
+          className="flex flex-col items-center gap-1 px-4 py-1 text-muted-foreground transition-colors hover:text-amber-dark"
+          onClick={() => setMobileView(mobileView === 'editor' ? 'preview' : 'editor')}
+        >
+          {mobileView === 'preview' ? <Code className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+          <span className="text-xs">{mobileView === 'preview' ? '编辑' : '预览'}</span>
+        </button>
+        <button
+          className="flex flex-col items-center gap-1 px-4 py-1 text-muted-foreground transition-colors hover:text-amber-dark"
           onClick={() => setSidebarOpen(true)}
         >
           <FileText className="w-5 h-5" />
           <span className="text-xs">设置</span>
         </button>
         <button
-          className="flex flex-col items-center gap-1 px-6 py-1 rounded-lg bg-amber text-white"
+          className="flex flex-col items-center gap-1 px-6 py-1 rounded-lg bg-amber text-white transition-opacity hover:opacity-90"
           onClick={() => handleSave(1)}
           disabled={saving}
         >
