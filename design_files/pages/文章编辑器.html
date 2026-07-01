@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文章编辑器 - 码上行</title>
+    <style id="theme-vars">
+/* ============================================
+   码上行 (CodeWalker) Brand Tokens
+   Warm Humanistic Tech — Cream, Amber, Serif
+   ============================================ */
+:root {
+  /* Backgrounds */
+  --brand-background: #FFFBF5;
+  --brand-muted: #F5EDE0;
+  --brand-card: #FFFFFF;
+  --brand-card-hover: #FFF9F0;
+
+  /* Text */
+  --brand-foreground: #2C1810;
+  --brand-foreground-secondary: #6B5344;
+  --brand-foreground-muted: #9C8577;
+
+  /* Accent */
+  --brand-primary: #C8820C;
+  --brand-primary-light: #F5D699;
+  --brand-primary-dark: #9A6309;
+
+  /* Borders */
+  --brand-border: #E8DDD0;
+  --brand-border-light: #F0E8DC;
+
+  /* Shadows */
+  --brand-shadow-sm: 0 1px 3px rgba(44,24,16,0.06);
+  --brand-shadow-md: 0 4px 12px rgba(44,24,16,0.08);
+
+  /* Typography */
+  --font-serif: 'Georgia', 'Noto Serif SC', serif;
+  --font-sans: 'Inter', 'Noto Sans SC', system-ui, sans-serif;
+  --font-code: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', monospace;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Spacing */
+  --section-padding: 80px;
+  --container-max: 1200px;
+
+  /* Editor specific */
+  --brand-code-bg: #2D2A26;
+  --brand-code-text: #F5E6D3;
+  --brand-code-sidebar: #252320;
+  --brand-code-line-num: #6B5D50;
+  --brand-code-border: #3E3A34;
+  --brand-code-keyword: #E8A54B;
+  --brand-code-string: #8BBF65;
+  --brand-code-comment: #6B5D50;
+  --brand-code-function: #6CB6FF;
+  --brand-code-type: #C8722A;
+}
+
+.dark {
+  --brand-background: #1A1410;
+  --brand-muted: #2A2018;
+  --brand-card: #242018;
+  --brand-card-hover: #2E2820;
+  --brand-foreground: #F0E8DC;
+  --brand-foreground-secondary: #BBA898;
+  --brand-foreground-muted: #8A7768;
+  --brand-primary: #F5C24C;
+  --brand-primary-light: #3D3018;
+  --brand-primary-dark: #E5A820;
+  --brand-border: #3D3228;
+  --brand-border-light: #302820;
+  --brand-shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
+  --brand-shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+
+  --brand-code-bg: #1C1916;
+  --brand-code-text: #F0E8DC;
+  --brand-code-sidebar: #161311;
+  --brand-code-line-num: #5A4D40;
+  --brand-code-border: #302820;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+@theme inline {
+  --color-primary: #D4663C;
+  --color-foreground: #2D2A26;
+  --color-muted: #FFF5EB;
+}
+@layer base {
+  body {
+    background: var(--brand-background);
+    color: var(--brand-foreground);
+    font-family: var(--font-sans);
+  }
+}
+
+@layer components {
+  /* Editor toolbar button */
+  .editor-tool-btn {
+    @apply inline-flex items-center justify-center w-8 h-8 rounded-md text-sm font-medium transition-colors cursor-pointer;
+    color: var(--brand-foreground-secondary);
+    background: transparent;
+  }
+  .editor-tool-btn:hover {
+    background: var(--brand-muted);
+    color: var(--brand-foreground);
+  }
+  .editor-tool-btn.active {
+    background: var(--brand-primary);
+    color: #FFFFFF;
+  }
+
+  /* Toolbar divider */
+  .toolbar-divider {
+    @apply w-px h-5 mx-1.5 shrink-0;
+    background: var(--brand-border);
+  }
+
+  /* Editor line gutter */
+  .line-gutter {
+    color: var(--brand-code-line-num);
+    font-family: var(--font-code);
+    font-size: 13px;
+    line-height: 1.7;
+    text-align: right;
+    user-select: none;
+    padding: 16px 12px 16px 16px;
+    min-width: 48px;
+  }
+
+  /* Markdown textarea */
+  .md-textarea {
+    background: transparent;
+    color: var(--brand-code-text);
+    font-family: var(--font-code);
+    font-size: 14px;
+    line-height: 1.7;
+    resize: none;
+    outline: none;
+    border: none;
+    width: 100%;
+    height: 100%;
+    padding: 16px;
+    tab-size: 4;
+  }
+  .md-textarea::placeholder {
+    color: var(--brand-code-line-num);
+  }
+
+  /* Preview content styling */
+  .preview-content h2 {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--brand-foreground);
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+  }
+  .preview-content h3 {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--brand-foreground);
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+  }
+  .preview-content p {
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    line-height: 1.8;
+    color: var(--brand-foreground-secondary);
+    margin-bottom: 1rem;
+  }
+  .preview-content strong {
+    color: var(--brand-foreground);
+    font-weight: 600;
+  }
+  .preview-content em {
+    font-style: italic;
+  }
+  .preview-content code {
+    font-family: var(--font-code);
+    font-size: 0.85rem;
+    background: var(--brand-muted);
+    color: var(--brand-primary-dark);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .preview-content pre {
+    background: var(--brand-code-bg);
+    color: var(--brand-code-text);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    margin: 1rem 0;
+    overflow-x: auto;
+    font-family: var(--font-code);
+    font-size: 0.85rem;
+    line-height: 1.7;
+  }
+  .preview-content pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+  }
+  .preview-content blockquote {
+    border-left: 3px solid var(--brand-primary);
+    background: var(--brand-primary-light);
+    padding: 0.75rem 1rem;
+    margin: 1rem 0;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    color: var(--brand-foreground-secondary);
+    font-style: italic;
+  }
+  .preview-content blockquote p {
+    margin-bottom: 0.25rem;
+  }
+  .preview-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.875rem;
+  }
+  .preview-content table th {
+    background: var(--brand-muted);
+    color: var(--brand-foreground);
+    font-weight: 600;
+    text-align: left;
+    padding: 0.625rem 1rem;
+    border-bottom: 2px solid var(--brand-border);
+    white-space: nowrap;
+  }
+  .preview-content table td {
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid var(--brand-border-light);
+    color: var(--brand-foreground-secondary);
+  }
+  .preview-content table tr:last-child td {
+    border-bottom: none;
+  }
+  .preview-content hr {
+    border: none;
+    border-top: 1px solid var(--brand-border);
+    margin: 1.5rem 0;
+  }
+
+  /* Syntax highlighting colors */
+  .syn-keyword { color: #E8A54B; }
+  .syn-string { color: #8BBF65; }
+  .syn-comment { color: #6B5D50; font-style: italic; }
+  .syn-function { color: #6CB6FF; }
+  .syn-type { color: #C8722A; }
+
+  /* Sidebar form input */
+  .sidebar-input {
+    @apply w-full px-3 py-2 text-sm rounded-md border outline-none transition-colors;
+    background: var(--brand-card);
+    border-color: var(--brand-border);
+    color: var(--brand-foreground);
+    font-family: var(--font-sans);
+  }
+  .sidebar-input:focus {
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 2px var(--brand-primary-light);
+  }
+  .sidebar-input::placeholder {
+    color: var(--brand-foreground-muted);
+  }
+
+  /* Tag pill */
+  .tag-pill {
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-medium;
+    background: var(--brand-primary-light);
+    color: var(--brand-primary-dark);
+    white-space: nowrap;
+  }
+
+  /* Danger zone */
+  .danger-zone {
+    border: 1px solid #E53935;
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    background: rgba(229, 57, 53, 0.04);
+  }
+
+  /* Mobile tab button */
+  .mobile-tab {
+    @apply px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer;
+    color: var(--brand-foreground-muted);
+  }
+  .mobile-tab.active {
+    background: var(--brand-primary);
+    color: #FFFFFF;
+  }
+}
+    </style>
+</head>
+<body class="m-0 p-0 overflow-hidden h-screen flex flex-col">
+
+<!-- ========== 1. Editor Top Bar ========== -->
+<header class="shrink-0 border-b-2" style="border-color: var(--brand-primary); background: var(--brand-card);">
+  <div class="flex items-center justify-between px-4 py-2.5 max-w-full">
+    <!-- Left: Back link -->
+    <div class="flex items-center gap-2 shrink-0">
+      <a data-dom-id="back-admin-articles" href="#" class="inline-flex items-center gap-1.5 text-sm font-medium transition-colors hover:opacity-80" style="color: var(--brand-foreground-muted);">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        <span class="hidden sm:inline">返回文章管理</span>
+      </a>
+    </div>
+
+    <!-- Center: Title input -->
+    <div class="flex-1 max-w-2xl mx-4">
+      <input type="text" placeholder="在此输入文章标题..." class="w-full text-center text-lg font-bold bg-transparent border-none outline-none" style="font-family: var(--font-serif); color: var(--brand-foreground);" value="Go 并发编程实战：从 Goroutine 到 Channel" />
+    </div>
+
+    <!-- Right: Actions -->
+    <div class="flex items-center gap-2.5 shrink-0">
+      <button class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-sm font-medium rounded-lg border-1.5 transition-colors cursor-pointer" style="border-color: var(--brand-border); color: var(--brand-foreground-secondary); background: transparent;">
+        <i data-lucide="save" class="w-3.5 h-3.5"></i>
+        <span class="hidden sm:inline">保存草稿</span>
+      </button>
+      <button class="inline-flex items-center gap-1.5 px-4 py-1.5 text-sm font-semibold rounded-lg transition-colors cursor-pointer" style="background: var(--brand-primary); color: #FFFFFF;">
+        <i data-lucide="send" class="w-3.5 h-3.5"></i>
+        <span class="hidden sm:inline">发布</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ========== 2. Editor Toolbar ========== -->
+<nav class="shrink-0 border-b" style="border-color: var(--brand-border); background: var(--brand-card);">
+  <div class="flex items-center gap-0.5 px-3 py-1.5 overflow-x-auto">
+    <!-- Text formatting -->
+    <button title="加粗" class="editor-tool-btn active" style="font-weight: 700;">B</button>
+    <button title="斜体" class="editor-tool-btn" style="font-style: italic;">I</button>
+    <button title="标题" class="editor-tool-btn" style="font-family: var(--font-serif);">H</button>
+    <button title="删除线" class="editor-tool-btn" style="text-decoration: line-through;">S</button>
+
+    <div class="toolbar-divider"></div>
+
+    <!-- Lists -->
+    <button title="无序列表" class="editor-tool-btn">
+      <i data-lucide="list" class="w-4 h-4"></i>
+    </button>
+    <button title="有序列表" class="editor-tool-btn">
+      <i data-lucide="list-ordered" class="w-4 h-4"></i>
+    </button>
+    <button title="任务列表" class="editor-tool-btn">
+      <i data-lucide="list-checks" class="w-4 h-4"></i>
+    </button>
+
+    <div class="toolbar-divider"></div>
+
+    <!-- Code & Quote -->
+    <button title="行内代码" class="editor-tool-btn" style="font-family: var(--font-code); font-size: 12px;">&lt;&gt;</button>
+    <button title="代码块" class="editor-tool-btn">
+      <i data-lucide="file-code-2" class="w-4 h-4"></i>
+    </button>
+    <button title="引用块" class="editor-tool-btn">
+      <i data-lucide="quote" class="w-4 h-4"></i>
+    </button>
+
+    <div class="toolbar-divider"></div>
+
+    <!-- Insert -->
+    <button title="链接" class="editor-tool-btn">
+      <i data-lucide="link" class="w-4 h-4"></i>
+    </button>
+    <button title="图片" class="editor-tool-btn">
+      <i data-lucide="image" class="w-4 h-4"></i>
+    </button>
+    <button title="表格" class="editor-tool-btn">
+      <i data-lucide="table" class="w-4 h-4"></i>
+    </button>
+
+    <div class="toolbar-divider"></div>
+
+    <!-- Misc -->
+    <button title="分割线" class="editor-tool-btn">
+      <i data-lucide="minus" class="w-4 h-4"></i>
+    </button>
+  </div>
+</nav>
+
+<!-- ========== 3. Main Editor Area (Two-Column) ========== -->
+<div class="flex-1 flex overflow-hidden">
+
+  <!-- Left: Markdown Editor (~60%) -->
+  <div class="flex-1 flex overflow-hidden" style="min-width: 0;">
+    <!-- Line numbers gutter -->
+    <div class="line-gutter shrink-0 overflow-hidden" style="background: var(--brand-code-sidebar);">
+      1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>
+      11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20<br>
+      21<br>22<br>23<br>24<br>25<br>26<br>27<br>28<br>29<br>30<br>
+      31<br>32<br>33<br>34<br>35<br>36<br>37<br>38<br>39<br>40<br>
+      41<br>42<br>43<br>44<br>45<br>46<br>47<br>48<br>49<br>50<br>
+      51<br>52<br>53<br>54<br>55<br>56<br>57<br>58<br>59<br>60<br>
+      61<br>62<br>63<br>64<br>65<br>66<br>67<br>68<br>69<br>70<br>
+      71<br>72<br>73<br>74<br>75<br>76<br>77<br>78<br>79<br>80<br>
+      81<br>82<br>83<br>84<br>85<br>86
+    </div>
+
+    <!-- Markdown textarea -->
+    <div class="flex-1 overflow-auto" style="background: var(--brand-code-bg);">
+      <textarea class="md-textarea" spellcheck="false" readonly>## 引言
+在 Go 语言中，并发编程是核心特性之一。本文将从 **Goroutine** 的基本概念出发，深入探讨 Go 并发模型的设计哲学与实战技巧。
+
+### Goroutine 基础
+Goroutine 是 Go 语言的轻量级线程，由 Go 运行时管理。与操作系统线程相比，Goroutine 的创建成本极低，初始栈大小仅为 *2KB*。
+
+```go
+func main() {
+    go func() {
+        fmt.Println("Hello from goroutine")
+    }()
+
+    fmt.Println("Hello from main")
+    time.Sleep(time.Second)
+}
+```
+
+> 并发不是并行。并发是同时处理很多事情，
+> 而并行是同时做很多事情。
+> — Rob Pike
+
+### Channel 通信
+Channel 是 Go 并发模型的核心通信机制，遵循 *"不要通过共享内存来通信，而应该通过通信来共享内存"* 的设计哲学。
+
+```go
+ch := make(chan string, 1)
+
+go func() {
+    ch &lt;- "数据已就绪"
+}()
+
+msg := &lt;-ch
+fmt.Println(msg)
+```
+
+### 并发模式对比
+
+| 特性 | Goroutine | OS Thread |
+|------|-----------|-----------|
+| 创建成本 | ~2KB | ~1MB |
+| 切换开销 | ~200ns | ~1μs |
+| 调度方式 | 协作式 (GMP) | 抢占式 |
+| 内存占用 | 极低 | 较高 |
+
+### 实战建议
+
+1. **控制并发数量**：使用 `semaphore` 模式限制 Goroutine 数量
+2. **优雅关闭**：利用 `context.Context` 实现超时与取消
+3. **错误处理**：使用 `errgroup` 管理并发错误
+4. **资源泄露**：确保 Channel 和 Goroutine 正确关闭
+
+---
+
+*本文持续更新中，欢迎在评论区讨论。*</textarea>
+    </div>
+  </div>
+
+  <!-- Resizable Divider -->
+  <div class="shrink-0 w-1 cursor-col-resize transition-colors" style="background: var(--brand-border);"></div>
+
+  <!-- Right: Preview Pane (~40%) -->
+  <div class="hidden lg:flex flex-col w-[40%] overflow-hidden" style="min-width: 0; background: var(--brand-card);">
+    <!-- Preview header -->
+    <div class="shrink-0 flex items-center gap-2 px-4 py-2 border-b" style="border-color: var(--brand-border);">
+      <i data-lucide="eye" class="w-3.5 h-3.5" style="color: var(--brand-foreground-muted);"></i>
+      <span class="text-xs font-semibold tracking-wide uppercase" style="color: var(--brand-foreground-muted);">预览</span>
+    </div>
+    <!-- Preview content -->
+    <div class="flex-1 overflow-y-auto p-6 lg:p-8">
+      <article class="preview-content max-w-none">
+        <h2>引言</h2>
+        <p>在 Go 语言中，并发编程是核心特性之一。本文将从 <strong>Goroutine</strong> 的基本概念出发，深入探讨 Go 并发模型的设计哲学与实战技巧。</p>
+
+        <h3>Goroutine 基础</h3>
+        <p>Goroutine 是 Go 语言的轻量级线程，由 Go 运行时管理。与操作系统线程相比，Goroutine 的创建成本极低，初始栈大小仅为 <em>2KB</em>。</p>
+
+        <pre><code><span class="syn-keyword">func</span> <span class="syn-function">main</span>() {
+    <span class="syn-keyword">go</span> <span class="syn-keyword">func</span>() {
+        fmt.<span class="syn-function">Println</span>(<span class="syn-string">"Hello from goroutine"</span>)
+    }()
+
+    fmt.<span class="syn-function">Println</span>(<span class="syn-string">"Hello from main"</span>)
+    time.<span class="syn-function">Sleep</span>(time.<span class="syn-type">Second</span>)
+}</code></pre>
+
+        <blockquote>
+          <p>并发不是并行。并发是同时处理很多事情，而并行是同时做很多事情。</p>
+          <p>— Rob Pike</p>
+        </blockquote>
+
+        <h3>Channel 通信</h3>
+        <p>Channel 是 Go 并发模型的核心通信机制，遵循 <em>"不要通过共享内存来通信，而应该通过通信来共享内存"</em> 的设计哲学。</p>
+
+        <pre><code>ch := <span class="syn-function">make</span>(<span class="syn-keyword">chan</span> <span class="syn-type">string</span>, <span class="syn-type">1</span>)
+
+<span class="syn-keyword">go</span> <span class="syn-keyword">func</span>() {
+    ch &lt;- <span class="syn-string">"数据已就绪"</span>
+}()
+
+msg := &lt;-ch
+fmt.<span class="syn-function">Println</span>(msg)</code></pre>
+
+        <h3>并发模式对比</h3>
+
+        <table>
+          <thead>
+            <tr>
+              <th>特性</th>
+              <th>Goroutine</th>
+              <th>OS Thread</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>创建成本</td>
+              <td>~2KB</td>
+              <td>~1MB</td>
+            </tr>
+            <tr>
+              <td>切换开销</td>
+              <td>~200ns</td>
+              <td>~1μs</td>
+            </tr>
+            <tr>
+              <td>调度方式</td>
+              <td>协作式 (GMP)</td>
+              <td>抢占式</td>
+            </tr>
+            <tr>
+              <td>内存占用</td>
+              <td>极低</td>
+              <td>较高</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>实战建议</h3>
+        <p><strong>1. 控制并发数量</strong>：使用 <code>semaphore</code> 模式限制 Goroutine 数量</p>
+        <p><strong>2. 优雅关闭</strong>：利用 <code>context.Context</code> 实现超时与取消</p>
+        <p><strong>3. 错误处理</strong>：使用 <code>errgroup</code> 管理并发错误</p>
+        <p><strong>4. 资源泄露</strong>：确保 Channel 和 Goroutine 正确关闭</p>
+
+        <hr>
+
+        <p><em>本文持续更新中，欢迎在评论区讨论。</em></p>
+      </article>
+    </div>
+  </div>
+
+  <!-- Mobile: Preview pane (tab-based) -->
+  <div class="lg:hidden flex-col flex-1 overflow-hidden" style="display: none; background: var(--brand-card);">
+    <div class="shrink-0 flex items-center gap-2 px-4 py-2 border-b" style="border-color: var(--brand-border);">
+      <i data-lucide="eye" class="w-3.5 h-3.5" style="color: var(--brand-foreground-muted);"></i>
+      <span class="text-xs font-semibold tracking-wide uppercase" style="color: var(--brand-foreground-muted);">预览</span>
+    </div>
+    <div class="flex-1 overflow-y-auto p-5">
+      <article class="preview-content max-w-none">
+        <h2>引言</h2>
+        <p>在 Go 语言中，并发编程是核心特性之一。</p>
+        <h3>Goroutine 基础</h3>
+        <p>Goroutine 是 Go 语言的轻量级线程，由 Go 运行时管理。</p>
+        <blockquote><p>并发不是并行。并发是同时处理很多事情，而并行是同时做很多事情。</p></blockquote>
+        <h3>并发模式对比</h3>
+        <table><thead><tr><th>特性</th><th>Goroutine</th><th>OS Thread</th></tr></thead><tbody><tr><td>创建成本</td><td>~2KB</td><td>~1MB</td></tr><tr><td>切换开销</td><td>~200ns</td><td>~1μs</td></tr></tbody></table>
+      </article>
+    </div>
+  </div>
+
+  <!-- ========== 4. Right Sidebar Panel ========== -->
+  <aside class="hidden xl:flex flex-col shrink-0 overflow-y-auto border-l" style="width: 260px; border-color: var(--brand-border); background: var(--brand-card);">
+    <div class="p-4 space-y-5">
+
+      <!-- 文章设置 -->
+      <div>
+        <h4 class="text-xs font-bold tracking-wide uppercase mb-3" style="color: var(--brand-foreground-muted);">文章设置</h4>
+
+        <!-- 分类 -->
+        <div class="mb-3">
+          <label class="block text-xs font-medium mb-1" style="color: var(--brand-foreground-secondary);">分类</label>
+          <select class="sidebar-input cursor-pointer">
+            <option>分布式系统</option>
+            <option>前端工程</option>
+            <option selected>Go语言</option>
+            <option>开源实践</option>
+            <option>云原生</option>
+            <option>架构设计</option>
+          </select>
+        </div>
+
+        <!-- 标签 -->
+        <div class="mb-3">
+          <label class="block text-xs font-medium mb-1.5" style="color: var(--brand-foreground-secondary);">标签</label>
+          <div class="flex flex-wrap gap-1.5 mb-1.5">
+            <span class="tag-pill">Go</span>
+            <span class="tag-pill">并发编程</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <input type="text" placeholder="添加标签..." class="sidebar-input text-xs py-1.5 flex-1" style="min-width: 0;" />
+            <button class="shrink-0 w-7 h-7 rounded-md inline-flex items-center justify-center text-xs font-bold transition-colors cursor-pointer" style="background: var(--brand-muted); color: var(--brand-foreground-muted);">+</button>
+          </div>
+        </div>
+
+        <!-- 封面图 -->
+        <div class="mb-3">
+          <label class="block text-xs font-medium mb-1.5" style="color: var(--brand-foreground-secondary);">封面图</label>
+          <div class="border-2 border-dashed rounded-lg flex flex-col items-center justify-center gap-1.5 py-6 cursor-pointer transition-colors" style="border-color: var(--brand-border); color: var(--brand-foreground-muted);">
+            <i data-lucide="image-plus" class="w-5 h-5"></i>
+            <span class="text-xs">点击上传封面图</span>
+          </div>
+        </div>
+
+        <!-- 摘要 -->
+        <div class="mb-3">
+          <label class="block text-xs font-medium mb-1" style="color: var(--brand-foreground-secondary);">摘要</label>
+          <textarea class="sidebar-input text-xs" rows="3" placeholder="输入文章摘要（可选，最多 200 字）" style="resize: none;">深入讲解 Go 语言并发编程的核心概念，包括 Goroutine、Channel 以及常用的并发模式。</textarea>
+        </div>
+
+        <!-- URL 别名 -->
+        <div class="mb-3">
+          <label class="block text-xs font-medium mb-1" style="color: var(--brand-foreground-secondary);">URL 别名</label>
+          <div class="flex items-center rounded-md border overflow-hidden" style="border-color: var(--brand-border);">
+            <span class="shrink-0 px-2.5 py-1.5 text-xs" style="background: var(--brand-muted); color: var(--brand-foreground-muted);">/blog/</span>
+            <input type="text" value="go-concurrency-guide" placeholder="article-url-slug" class="flex-1 min-w-0 px-2.5 py-1.5 text-xs border-none outline-none bg-transparent" style="color: var(--brand-foreground);" />
+          </div>
+        </div>
+
+        <!-- 阅读时间 -->
+        <div class="flex items-center gap-2 px-1">
+          <i data-lucide="clock" class="w-3.5 h-3.5" style="color: var(--brand-foreground-muted);"></i>
+          <span class="text-xs" style="color: var(--brand-foreground-muted);">预计阅读 12 分钟</span>
+        </div>
+      </div>
+
+      <hr style="border-color: var(--brand-border-light);" />
+
+      <!-- 发布设置 -->
+      <div>
+        <h4 class="text-xs font-bold tracking-wide uppercase mb-3" style="color: var(--brand-foreground-muted);">发布设置</h4>
+
+        <!-- 发布状态 -->
+        <div class="mb-3">
+          <label class="block text-xs font-medium mb-1" style="color: var(--brand-foreground-secondary);">发布状态</label>
+          <div class="flex gap-1.5">
+            <button class="flex-1 px-2.5 py-1.5 text-xs font-medium rounded-md border transition-colors cursor-pointer" style="border-color: var(--brand-border); color: var(--brand-foreground-muted); background: transparent;">草稿</button>
+            <button class="flex-1 px-2.5 py-1.5 text-xs font-medium rounded-md border transition-colors cursor-pointer" style="border-color: var(--brand-primary); color: var(--brand-primary); background: var(--brand-primary-light);">已发布</button>
+            <button class="flex-1 px-2.5 py-1.5 text-xs font-medium rounded-md border transition-colors cursor-pointer" style="border-color: var(--brand-border); color: var(--brand-foreground-muted); background: transparent;">定时</button>
+          </div>
+        </div>
+
+        <!-- 是否置顶 -->
+        <div class="flex items-center gap-2.5 mb-2.5 px-1">
+          <input type="checkbox" class="w-3.5 h-3.5 rounded cursor-pointer accent-amber-600" />
+          <label class="text-xs cursor-pointer" style="color: var(--brand-foreground-secondary);">是否置顶</label>
+        </div>
+
+        <!-- 允许评论 -->
+        <div class="flex items-center gap-2.5 px-1">
+          <input type="checkbox" checked class="w-3.5 h-3.5 rounded cursor-pointer accent-amber-600" />
+          <label class="text-xs cursor-pointer" style="color: var(--brand-foreground-secondary);">允许评论</label>
+        </div>
+      </div>
+
+      <hr style="border-color: var(--brand-border-light);" />
+
+      <!-- 危险操作 -->
+      <div class="danger-zone">
+        <h4 class="text-xs font-bold mb-2" style="color: #C0392B;">危险操作</h4>
+        <button class="w-full px-3 py-1.5 text-xs font-medium rounded-md border transition-colors cursor-pointer" style="border-color: #E53935; color: #E53935; background: transparent;">
+          <span class="inline-flex items-center justify-center gap-1.5">
+            <i data-lucide="trash-2" class="w-3 h-3"></i>
+            删除文章
+          </span>
+        </button>
+      </div>
+
+    </div>
+  </aside>
+
+</div>
+
+<!-- ========== 5. Bottom Status Bar ========== -->
+<footer class="shrink-0 border-t flex items-center justify-between px-4 py-1.5 text-xs" style="border-color: var(--brand-border); background: var(--brand-card); color: var(--brand-foreground-muted);">
+  <!-- Left: Stats -->
+  <div class="flex items-center gap-3">
+    <span>字数: 3,280</span>
+    <span>行数: 86</span>
+    <span class="hidden sm:inline-flex items-center gap-1">
+      <i data-lucide="flame" class="w-3 h-3" style="color: var(--brand-primary);"></i>
+      <span style="color: var(--brand-primary);">连续写作 12 周</span>
+    </span>
+  </div>
+  <!-- Center: Auto-save -->
+  <div class="hidden md:flex items-center gap-1.5">
+    <span class="w-1.5 h-1.5 rounded-full" style="background: #66BB6A;"></span>
+    <span>最后保存: 2 分钟前自动保存</span>
+  </div>
+  <!-- Right: Language -->
+  <div class="flex items-center gap-3">
+    <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded" style="background: var(--brand-muted);">
+      <i data-lucide="file-text" class="w-3 h-3"></i>
+      Markdown
+    </span>
+  </div>
+</footer>
+
+<!-- ========== Mobile: Tab Switcher (visible on mobile only) ========== -->
+<div class="xl:hidden fixed bottom-10 left-1/2 -translate-x-1/2 z-50">
+  <div class="flex items-center gap-1 px-1 py-1 rounded-full shadow-lg" style="background: var(--brand-card); box-shadow: var(--brand-shadow-lg);">
+    <button class="mobile-tab active">
+      <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+      编辑
+    </button>
+    <button class="mobile-tab">
+      <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+      预览
+    </button>
+    <button class="mobile-tab">
+      <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+      设置
+    </button>
+  </div>
+</div>
+
+<!-- Lucide icons initialization -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+  });
+</script>
+
+</body>
+</html>

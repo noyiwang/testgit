@@ -34,10 +34,27 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 			articles.GET("/featured", articleHandler.Featured)
 			articles.GET("/categories", articleHandler.Categories)
 			articles.GET("/tags", articleHandler.Tags)
-			articles.GET("/:id", articleHandler.Detail)
 			articles.GET("/slug/:slug", articleHandler.DetailBySlug)
+			articles.GET("/:id", articleHandler.Detail)
 			articles.GET("/:id/related", articleHandler.Related)
 			articles.POST("/:id/like", articleHandler.Like)
+		}
+
+		admin := api.Group("/admin")
+		{
+			adminArticles := admin.Group("/articles")
+			{
+				adminArticles.GET("", articleHandler.AdminList)
+				adminArticles.GET("/stats", articleHandler.AdminStats)
+				adminArticles.GET("/drafts", articleHandler.AdminDrafts)
+				adminArticles.GET("/categories", articleHandler.AdminCategories)
+				adminArticles.GET("/:id", articleHandler.AdminDetail)
+				adminArticles.POST("", articleHandler.Create)
+				adminArticles.PUT("/:id", articleHandler.Update)
+				adminArticles.DELETE("/:id", articleHandler.Delete)
+				adminArticles.POST("/batch/status", articleHandler.BatchUpdateStatus)
+				adminArticles.POST("/batch/delete", articleHandler.BatchDelete)
+			}
 		}
 
 		courses := api.Group("/courses")

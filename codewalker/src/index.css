@@ -40,6 +40,8 @@
   --brand-secondary-foreground: #1a1410;
   --brand-accent: #c8722a;
   --brand-accent-foreground: #ede5d8;
+  --brand-destructive: #e5544b;
+  --brand-destructive-foreground: #ffffff;
   --brand-popover: #261e16;
   --brand-popover-foreground: #ede5d8;
   --brand-ring: #d4894a;
@@ -50,6 +52,8 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
   }
+  td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+  th { @apply whitespace-nowrap; }
 }
 
 @layer components {
@@ -74,6 +78,13 @@
     @apply bg-primary text-primary-foreground;
   }
 
+  .btn-secondary-sm {
+    @apply inline-flex items-center justify-center gap-2 bg-transparent text-amber-dark border border-amber font-medium px-3 py-2 rounded-lg text-sm transition-all duration-200;
+  }
+  .btn-secondary-sm:hover {
+    @apply bg-amber/10;
+  }
+
   .tag {
     @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-small bg-muted text-muted-foreground whitespace-nowrap;
   }
@@ -84,6 +95,187 @@
 
   .container-brand {
     @apply max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .admin-table-row {
+    @apply transition-colors duration-150;
+  }
+  .admin-table-row:hover {
+    @apply bg-amber/5;
+  }
+  .admin-table-row.row-selected {
+    @apply bg-amber/10;
+  }
+
+  .stat-card {
+    @apply bg-card border border-warm-border rounded-xlarge shadow-card transition-all duration-200 p-4 sm:p-5;
+  }
+  .stat-card:hover {
+    @apply shadow-card-hover -translate-y-0.5;
+  }
+
+  .status-badge {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-full whitespace-nowrap;
+  }
+  .status-published {
+    @apply bg-green-bg text-green-diff;
+  }
+  .status-draft {
+    @apply bg-amber/10 text-amber-dark;
+  }
+  .status-archived {
+    @apply bg-warm-gray text-muted-foreground;
+  }
+
+  .filter-tab {
+    @apply px-4 py-2 text-sm font-medium text-muted-foreground border-b-2 border-transparent transition-colors whitespace-nowrap;
+  }
+  .filter-tab:hover {
+    @apply text-foreground;
+  }
+  .filter-tab.tab-active {
+    @apply text-amber-dark border-amber font-semibold;
+  }
+
+  .action-btn {
+    @apply inline-flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground transition-colors;
+  }
+  .action-btn:hover {
+    @apply bg-cream-dark text-foreground;
+  }
+  .action-btn.delete-btn:hover {
+    @apply bg-red-bg text-red-diff;
+  }
+
+  .page-btn {
+    @apply inline-flex items-center justify-center min-w-[2.25rem] h-[2.25rem] px-2 text-sm font-medium rounded-lg text-muted-foreground transition-colors whitespace-nowrap;
+  }
+  .page-btn:hover {
+    @apply bg-cream-dark text-foreground;
+  }
+  .page-btn.page-active {
+    @apply bg-amber text-white font-bold;
+  }
+
+  .bulk-action-btn {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg text-muted-foreground transition-colors whitespace-nowrap;
+  }
+  .bulk-action-btn:hover {
+    @apply bg-cream-dark text-foreground;
+  }
+  .bulk-action-btn.danger:hover {
+    @apply bg-red-bg text-red-diff;
+  }
+
+  .sidebar-section {
+    @apply bg-card border border-warm-border rounded-xlarge p-5;
+  }
+
+  .tag-pill {
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-medium whitespace-nowrap bg-amber/15 text-amber-dark;
+  }
+
+  .sidebar-input {
+    @apply w-full px-3 py-2 text-sm rounded-md border outline-none transition-colors bg-card border-warm-border;
+  }
+  .sidebar-input:focus {
+    @apply border-primary ring-2 ring-amber/20;
+  }
+  .sidebar-input::placeholder {
+    @apply text-muted-foreground;
+  }
+
+  .editor-tool-btn {
+    @apply inline-flex items-center justify-center w-8 h-8 rounded-md text-sm font-medium transition-colors cursor-pointer text-muted-foreground;
+  }
+  .editor-tool-btn:hover {
+    @apply bg-muted text-foreground;
+  }
+  .editor-tool-btn.active {
+    @apply bg-primary text-white;
+  }
+
+  .toolbar-divider {
+    @apply w-px h-5 mx-1.5 shrink-0 bg-border;
+  }
+
+  .line-gutter {
+    @apply font-mono text-[13px] leading-[1.7] text-right select-none py-4 px-3 min-w-12 shrink-0 overflow-hidden;
+    color: rgb(from var(--brand-muted-foreground) r g b / 0.5);
+  }
+
+  .md-textarea {
+    @apply bg-transparent text-code-text font-mono text-sm leading-[1.7] resize-none outline-none border-none w-full h-full p-4;
+    tab-size: 4;
+  }
+  .md-textarea::placeholder {
+    color: rgb(from var(--brand-muted-foreground) r g b / 0.5);
+  }
+
+  .mobile-tab {
+    @apply px-4 py-2 text-sm font-medium rounded-lg transition-colors cursor-pointer text-muted-foreground;
+  }
+  .mobile-tab.active {
+    @apply bg-primary text-white;
+  }
+
+  .preview-content h2 {
+    @apply font-serif text-2xl font-bold text-foreground mt-8 mb-3 leading-snug;
+  }
+  .preview-content h3 {
+    @apply font-serif text-xl font-semibold text-foreground mt-6 mb-2 leading-snug;
+  }
+  .preview-content p {
+    @apply font-sans text-[0.9375rem] leading-[1.8] text-muted-foreground mb-4;
+  }
+  .preview-content strong {
+    @apply text-foreground font-semibold;
+  }
+  .preview-content em {
+    @apply italic;
+  }
+  .preview-content code {
+    @apply font-mono text-sm bg-muted text-primary px-1.5 py-0.5 rounded;
+  }
+  .preview-content pre {
+    @apply bg-code-bg text-code-text rounded-large p-5 my-4 overflow-x-auto font-mono text-sm leading-[1.7];
+  }
+  .preview-content pre code {
+    @apply bg-transparent text-inherit p-0 rounded-none;
+  }
+  .preview-content blockquote {
+    @apply border-l-[3px] border-primary bg-amber/10 px-4 py-3 my-4 rounded-r-large text-muted-foreground italic;
+  }
+  .preview-content blockquote p {
+    @apply mb-1;
+  }
+  .preview-content table {
+    @apply w-full border-collapse my-4 text-sm;
+  }
+  .preview-content table th {
+    @apply bg-muted text-foreground font-semibold text-left px-4 py-2.5 border-b-2 border-border whitespace-nowrap;
+  }
+  .preview-content table td {
+    @apply px-4 py-2 border-b text-muted-foreground;
+    border-bottom-color: rgb(from var(--brand-border) r g b / 0.5);
+  }
+  .preview-content table tr:last-child td {
+    @apply border-b-0;
+  }
+  .preview-content hr {
+    @apply border-0 border-t border-border my-6;
+  }
+  .preview-content ul, .preview-content ol {
+    @apply my-4 pl-6 text-muted-foreground leading-[1.8];
+  }
+  .preview-content ul {
+    @apply list-disc;
+  }
+  .preview-content ol {
+    @apply list-decimal;
+  }
+  .preview-content li {
+    @apply mb-1;
   }
 }
 
