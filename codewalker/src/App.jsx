@@ -6,8 +6,10 @@ import Blog from './pages/Blog'
 import BlogDetail from './pages/BlogDetail'
 import Courses from './pages/Courses'
 import Projects from './pages/Projects'
+import AdminLogin from './pages/AdminLogin'
 import AdminArticles from './pages/AdminArticles'
 import ArticleEditor from './pages/ArticleEditor'
+import RequireAuth from './components/RequireAuth'
 
 function App() {
   return (
@@ -19,9 +21,22 @@ function App() {
         <Route path="/blog/:id" element={<BlogDetail />} />
         <Route path="/courses" element={<Courses />} />
         <Route path="/projects" element={<Projects />} />
-        <Route path="/admin/articles" element={<AdminArticles />} />
-        <Route path="/admin/articles/new" element={<ArticleEditor />} />
-        <Route path="/admin/articles/edit/:id" element={<ArticleEditor />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/articles" element={
+          <RequireAuth>
+            <AdminArticles />
+          </RequireAuth>
+        } />
+        <Route path="/admin/editor/new" element={
+          <RequireAuth>
+            <ArticleEditor />
+          </RequireAuth>
+        } />
+        <Route path="/admin/editor/:id" element={
+          <RequireAuth>
+            <ArticleEditor />
+          </RequireAuth>
+        } />
       </Routes>
     </ThemeProvider>
   )

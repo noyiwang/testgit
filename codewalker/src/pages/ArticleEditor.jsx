@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { marked } from 'marked'
+import hljs from 'highlight.js'
 import {
-  ArrowLeft, Bold, Italic, Strikethrough, Link2, List, ListOrdered, ListChecks, Code,
+  ArrowLeft, Bold, Italic, Strikethrough, Link2, List, ListOrdered, ListChecks,
   FileCode2, Quote, Image, Table, Minus, Eye, EyeOff, Save, Send, X,
-  FileText, Trash2, Clock, Type
+  FileText, Trash2, Clock, Type, Upload, Download, Calendar, Copy, Check
 } from 'lucide-react'
 import AdminNavbar from '../components/AdminNavbar'
 import { adminArticleAPI, mockData } from '../services/api'
@@ -19,11 +20,46 @@ renderer.listitem = function(text, task, checked) {
   return originalListitem(text, task, checked)
 }
 
+renderer.code = function(code, language) {
+  const lang = language || 'plaintext'
+  let highlighted
+  try {
+    highlighted = hljs.highlight(code, { language: lang, ignoreIllegals: true }).value
+  } catch {
+    highlighted = hljs.highlightAuto(code).value
+  }
+  const langLabel = lang === 'plaintext' ? 'Code' : lang
+  return `<div class="code-block-wrapper relative group my-4">
+    <div class="absolute top-2 right-2 flex items-center gap-2 z-10">
+      <span class="text-xs px-2 py-0.5 rounded bg-black/30 text-white/60 font-mono">${langLabel}</span>
+      <button class="copy-code-btn opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded bg-black/30 text-white/60 hover:text-white hover:bg-black/50" onclick="copyCodeBlock(this)" title="复制代码">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+      </button>
+    </div>
+    <pre class="!mt-0 !mb-0 !rounded-t-none"><code class="hljs language-${lang}">${highlighted}</code></pre>
+  </div>`
+}
+
 marked.setOptions({
   breaks: true,
   gfm: true,
   renderer,
 })
+
+if (typeof window !== 'undefined') {
+  window.copyCodeBlock = function(btn) {
+    const wrapper = btn.closest('.code-block-wrapper')
+    const code = wrapper.querySelector('code')
+    navigator.clipboard.writeText(code.textContent).then(() => {
+      btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+      btn.classList.add('text-green-400')
+      setTimeout(() => {
+        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>'
+        btn.classList.remove('text-green-400')
+      }, 2000)
+    })
+  }
+}
 
 const defaultContent = `## 开始写作
 
@@ -45,6 +81,16 @@ const defaultContent = `## 开始写作
 - [ ] 任务列表未完成
 - [x] 任务列表已完成
 
+\`\`\`go
+package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Hello, World!")
+}
+\`\`\`
+
 | 标题 | 描述 |
 |------|------|
 | 内容 | 示例 |
@@ -56,14 +102,54 @@ const defaultContent = `## 开始写作
 
 const categories = ['分布式系统', '前端工程', 'Go语言', '开源实践', '云原生', '架构设计']
 
+function parseFrontMatter(content) {
+  const fmMatch = content.match(/^---\s*\n([\s\S]*?)\n---\s*\n?([\s\S]*)$/)
+  if (!fmMatch) return { metadata: {}, body: content }
+
+  const metadata = {}
+  const fmContent = fmMatch[1]
+  const body = fmMatch[2]
+
+  fmContent.split('\n').forEach(line => {
+    const colonIdx = line.indexOf(':')
+    if (colonIdx > 0) {
+      const key = line.slice(0, colonIdx).trim()
+      let value = line.slice(colonIdx + 1).trim()
+      value = value.replace(/^["']|["']$/g, '')
+      if (value.startsWith('[') && value.endsWith(']')) {
+        value = value.slice(1, -1).split(',').map(s => s.trim().replace(/^["']|["']$/g, ''))
+      }
+      metadata[key] = value
+    }
+  })
+
+  return { metadata, body }
+}
+
+function buildFrontMatter(data) {
+  const lines = ['---']
+  if (data.title) lines.push(`title: "${data.title.replace(/"/g, '\\"')}"`)
+  if (data.slug) lines.push(`slug: "${data.slug}"`)
+  if (data.category) lines.push(`category: "${data.category}"`)
+  if (data.tags && data.tags.length > 0) lines.push(`tags: [${data.tags.map(t => `"${t}"`).join(', ')}]`)
+  if (data.summary) lines.push(`summary: "${data.summary.replace(/"/g, '\\"')}"`)
+  if (data.cover) lines.push(`cover: "${data.cover}"`)
+  if (data.is_pinned !== undefined) lines.push(`is_pinned: ${data.is_pinned}`)
+  if (data.allow_comments !== undefined) lines.push(`allow_comments: ${data.allow_comments}`)
+  if (data.published_at) lines.push(`date: ${data.published_at}`)
+  lines.push('---')
+  return lines.join('\n') + '\n\n'
+}
+
 function ArticleEditor() {
   const navigate = useNavigate()
   const { id } = useParams()
-  const isEdit = !!id
+  const isEdit = !!id && id !== 'new'
 
   const textareaRef = useRef(null)
   const lineGutterRef = useRef(null)
   const autoSaveTimerRef = useRef(null)
+  const fileInputRef = useRef(null)
 
   const [loading, setLoading] = useState(isEdit)
   const [saving, setSaving] = useState(false)
@@ -71,6 +157,7 @@ function ArticleEditor() {
   const [lastSaved, setLastSaved] = useState(null)
   const [lineCount, setLineCount] = useState(1)
   const [articleId, setArticleId] = useState(null)
+  const [copied, setCopied] = useState(false)
 
   const [title, setTitle] = useState('')
   const [slug, setSlug] = useState('')
@@ -83,6 +170,8 @@ function ArticleEditor() {
   const [isPinned, setIsPinned] = useState(false)
   const [allowComments, setAllowComments] = useState(true)
   const [publishedAt, setPublishedAt] = useState('')
+  const [publishStatus, setPublishStatus] = useState('draft')
+  const [scheduledAt, setScheduledAt] = useState('')
   const [showPreview, setShowPreview] = useState(true)
 
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -90,6 +179,7 @@ function ArticleEditor() {
   const [wordCount, setWordCount] = useState(0)
   const [readTime, setReadTime] = useState(0)
   const [charCount, setCharCount] = useState(0)
+  const [writingStreak, setWritingStreak] = useState(0)
 
   const [unsavedChanges, setUnsavedChanges] = useState(false)
 
@@ -118,6 +208,13 @@ function ArticleEditor() {
         setAllowComments(article.allow_comments !== false)
         setPublishedAt(article.published_at ? article.published_at.split('T')[0] : '')
         setArticleId(parseInt(id))
+        if (article.status === 1) {
+          setPublishStatus('published')
+        } else if (article.status === 2) {
+          setPublishStatus('archived')
+        } else {
+          setPublishStatus('draft')
+        }
       }
       setLoading(false)
     }
@@ -144,7 +241,7 @@ function ArticleEditor() {
     if (autoSaveTimerRef.current) {
       clearTimeout(autoSaveTimerRef.current)
     }
-    if (unsavedChanges && title.trim()) {
+    if (unsavedChanges && title.trim() && publishStatus === 'draft') {
       autoSaveTimerRef.current = setTimeout(() => {
         handleAutoSave()
       }, 30000)
@@ -154,7 +251,14 @@ function ArticleEditor() {
         clearTimeout(autoSaveTimerRef.current)
       }
     }
-  }, [content, title, unsavedChanges])
+  }, [content, title, unsavedChanges, publishStatus])
+
+  useEffect(() => {
+    const streak = setInterval(() => {
+      setWritingStreak(s => s + 1)
+    }, 60000)
+    return () => clearInterval(streak)
+  }, [])
 
   const insertMarkdown = useCallback((before, after = '', placeholder = '', block = false) => {
     const textarea = textareaRef.current
@@ -210,7 +314,7 @@ function ArticleEditor() {
   }
 
   const insertCodeBlock = () => {
-    insertMarkdown('\n```\n', '\n```\n', '代码', false)
+    insertMarkdown('\n```go\n', '\n```\n', '// 代码', false)
   }
 
   const insertTable = () => {
@@ -219,6 +323,70 @@ function ArticleEditor() {
 
   const insertHr = () => {
     insertMarkdown('\n---\n', '', '', false)
+  }
+
+  const handleImport = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = (evt) => {
+      const text = evt.target?.result
+      if (typeof text !== 'string') return
+
+      const { metadata, body } = parseFrontMatter(text)
+
+      if (metadata.title) setTitle(metadata.title)
+      if (metadata.slug) setSlug(metadata.slug)
+      if (metadata.category && categories.includes(metadata.category)) setCategory(metadata.category)
+      if (metadata.tags) {
+        if (Array.isArray(metadata.tags)) setTags(metadata.tags)
+        else setTags(String(metadata.tags).split(',').map(t => t.trim()))
+      }
+      if (metadata.summary) setSummary(metadata.summary)
+      if (metadata.cover) setCover(metadata.cover)
+      if (metadata.is_pinned !== undefined) setIsPinned(metadata.is_pinned === true || metadata.is_pinned === 'true')
+      if (metadata.allow_comments !== undefined) setAllowComments(metadata.allow_comments !== false && metadata.allow_comments !== 'false')
+      if (metadata.date) setPublishedAt(metadata.date)
+
+      setContent(body || text)
+      setUnsavedChanges(true)
+      setWritingStreak(0)
+    }
+    reader.readAsText(file)
+    e.target.value = ''
+  }
+
+  const handleExport = () => {
+    const data = getFormData()
+    const fm = buildFrontMatter({
+      title,
+      slug,
+      category,
+      tags,
+      summary,
+      cover,
+      is_pinned: isPinned,
+      allow_comments: allowComments,
+      published_at: publishedAt || new Date().toISOString().split('T')[0],
+    })
+    const exportContent = fm + content
+    const blob = new Blob([exportContent], { type: 'text/markdown;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${slug || title || 'article'}.md`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  const handleCopyContent = () => {
+    navigator.clipboard.writeText(content).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
   }
 
   const handleInputChange = (e) => {
@@ -329,10 +497,20 @@ function ArticleEditor() {
     const data = getFormData()
     data.status = status
 
-    if (status === 1 && publishedAt) {
-      data.published_at = publishedAt
-    } else if (status === 1 && !publishedAt) {
-      data.published_at = new Date().toISOString().split('T')[0]
+    if (publishStatus === 'scheduled' && scheduledAt) {
+      data.scheduled_at = scheduledAt
+      data.status = 0
+    }
+
+    if (status === 1) {
+      if (scheduledAt && publishStatus === 'scheduled') {
+        data.published_at = scheduledAt
+        data.status = 0
+      } else if (publishedAt) {
+        data.published_at = publishedAt
+      } else {
+        data.published_at = new Date().toISOString().split('T')[0]
+      }
     }
 
     try {
@@ -346,7 +524,8 @@ function ArticleEditor() {
       }
       setLastSaved(new Date())
       setUnsavedChanges(false)
-      if (status === 1) {
+      setWritingStreak(0)
+      if (status === 1 && publishStatus !== 'scheduled') {
         navigate('/admin/articles')
       }
     } catch (e) {
@@ -367,7 +546,10 @@ function ArticleEditor() {
         setIsPinned(false)
         setAllowComments(true)
         setPublishedAt('')
+        setScheduledAt('')
+        setPublishStatus('draft')
         setUnsavedChanges(false)
+        setWritingStreak(0)
       }
       return
     }
@@ -397,6 +579,10 @@ function ArticleEditor() {
             e.preventDefault()
             insertMarkdown('[', '](https://)', '链接文字')
             break
+          case 'o':
+            e.preventDefault()
+            fileInputRef.current?.click()
+            break
         }
       }
     }
@@ -416,11 +602,17 @@ function ArticleEditor() {
     .filter(t => !tags.includes(t))
 
   const formatLastSaved = () => {
-    if (!lastSaved) return '未保存'
+    if (!lastSaved) return null
     const diff = Math.floor((new Date() - lastSaved) / 1000)
     if (diff < 60) return '刚刚自动保存'
     if (diff < 3600) return `${Math.floor(diff / 60)}分钟前自动保存`
     return lastSaved.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) + ' 保存'
+  }
+
+  const formatWritingStreak = () => {
+    if (writingStreak < 1) return ''
+    if (writingStreak < 60) return `${writingStreak}秒`
+    return `${Math.floor(writingStreak / 60)}分${writingStreak % 60}秒`
   }
 
   if (loading) {
@@ -434,6 +626,14 @@ function ArticleEditor() {
   return (
     <div className="h-screen flex flex-col bg-cream overflow-hidden">
       <AdminNavbar />
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".md,.markdown"
+        className="hidden"
+        onChange={handleImport}
+      />
 
       <header className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 border-b-2 border-amber bg-white shrink-0">
         <button
@@ -457,6 +657,24 @@ function ArticleEditor() {
             autoFocus
           />
         </div>
+        <div className="hidden sm:flex items-center gap-2 shrink-0">
+          <button
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-warm-border text-muted-foreground bg-transparent transition-colors hover:bg-cream-dark whitespace-nowrap"
+            onClick={() => fileInputRef.current?.click()}
+            title="导入Markdown (Ctrl+O)"
+          >
+            <Upload className="w-3.5 h-3.5" />
+            <span>导入</span>
+          </button>
+          <button
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium border border-warm-border text-muted-foreground bg-transparent transition-colors hover:bg-cream-dark whitespace-nowrap"
+            onClick={handleExport}
+            title="导出Markdown"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>导出</span>
+          </button>
+        </div>
         <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
           <button
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border border-warm-border text-brown-light bg-transparent transition-colors hover:bg-cream-dark whitespace-nowrap disabled:opacity-50"
@@ -469,11 +687,11 @@ function ArticleEditor() {
           </button>
           <button
             className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-lg text-sm font-semibold text-white bg-amber transition-opacity hover:opacity-90 whitespace-nowrap disabled:opacity-50"
-            onClick={() => handleSave(1)}
+            onClick={() => handleSave(publishStatus === 'scheduled' ? 0 : 1)}
             disabled={saving}
           >
             <Send className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">发布</span>
+            <span className="hidden sm:inline">{publishStatus === 'scheduled' ? '定时' : '发布'}</span>
           </button>
         </div>
       </header>
@@ -525,6 +743,15 @@ function ArticleEditor() {
         </button>
 
         <div className="flex-1" />
+        <div className="hidden md:flex items-center gap-1 mr-2">
+          <button
+            className="editor-tool-btn"
+            onClick={handleCopyContent}
+            title="复制Markdown"
+          >
+            {copied ? <Check className="w-4 h-4 text-green-diff" /> : <Copy className="w-4 h-4" />}
+          </button>
+        </div>
         <button
           className={`editor-tool-btn ${showPreview ? 'active' : ''}`}
           onClick={() => setShowPreview(!showPreview)}
@@ -608,6 +835,67 @@ function ArticleEditor() {
             </div>
 
             <div>
+              <label className="block text-xs font-bold tracking-wide uppercase mb-2 text-muted-foreground">发布状态</label>
+              <div className="space-y-2">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="publishStatus"
+                    className="w-4 h-4 accent-amber"
+                    checked={publishStatus === 'draft'}
+                    onChange={() => { setPublishStatus('draft'); setUnsavedChanges(true) }}
+                  />
+                  <span className="text-sm text-brown-dark">草稿（仅自己可见）</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="publishStatus"
+                    className="w-4 h-4 accent-amber"
+                    checked={publishStatus === 'published'}
+                    onChange={() => { setPublishStatus('published'); setUnsavedChanges(true) }}
+                  />
+                  <span className="text-sm text-brown-dark">立即发布</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="publishStatus"
+                    className="w-4 h-4 accent-amber"
+                    checked={publishStatus === 'scheduled'}
+                    onChange={() => { setPublishStatus('scheduled'); setUnsavedChanges(true) }}
+                  />
+                  <span className="text-sm text-brown-dark flex items-center gap-1">
+                    <Calendar className="w-3.5 h-3.5" />
+                    定时发布
+                  </span>
+                </label>
+              </div>
+              {publishStatus === 'scheduled' && (
+                <div className="mt-3">
+                  <input
+                    type="datetime-local"
+                    className="sidebar-input"
+                    value={scheduledAt}
+                    onChange={(e) => { setScheduledAt(e.target.value); setUnsavedChanges(true) }}
+                  />
+                  <p className="text-xs mt-1 text-muted-foreground">设置后文章将在指定时间自动发布</p>
+                </div>
+              )}
+              {publishStatus === 'published' && (
+                <div className="mt-3">
+                  <label className="block text-xs font-medium mb-1 text-muted-foreground">发布日期</label>
+                  <input
+                    type="date"
+                    className="sidebar-input"
+                    value={publishedAt}
+                    onChange={(e) => { setPublishedAt(e.target.value); setUnsavedChanges(true) }}
+                  />
+                </div>
+              )}
+            </div>
+
+            <div>
               <label className="block text-xs font-bold tracking-wide uppercase mb-2 text-muted-foreground">分类</label>
               <select
                 className="sidebar-input cursor-pointer"
@@ -683,16 +971,6 @@ function ArticleEditor() {
               )}
             </div>
 
-            <div>
-              <label className="block text-xs font-bold tracking-wide uppercase mb-2 text-muted-foreground">发布时间</label>
-              <input
-                type="date"
-                className="sidebar-input"
-                value={publishedAt}
-                onChange={(e) => { setPublishedAt(e.target.value); setUnsavedChanges(true) }}
-              />
-            </div>
-
             <div className="space-y-3">
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
@@ -712,6 +990,27 @@ function ArticleEditor() {
                 />
                 <span className="text-sm text-brown-dark">允许评论</span>
               </label>
+            </div>
+
+            <div className="pt-4 border-t border-warm-border">
+              <h4 className="text-xs font-bold tracking-wide uppercase mb-3 text-muted-foreground">导入/导出</h4>
+              <div className="space-y-2">
+                <button
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-warm-border text-brown-light bg-transparent transition-colors hover:bg-cream-dark"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Upload className="w-4 h-4" />
+                  导入 Markdown 文件
+                </button>
+                <button
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-warm-border text-brown-light bg-transparent transition-colors hover:bg-cream-dark"
+                  onClick={handleExport}
+                >
+                  <Download className="w-4 h-4" />
+                  导出为 Markdown
+                </button>
+              </div>
+              <p className="text-xs mt-2 text-muted-foreground">支持 Front Matter (YAML) 自动解析</p>
             </div>
 
             <div className="pt-4 border-t border-warm-border">
@@ -744,6 +1043,12 @@ function ArticleEditor() {
             <Clock className="w-3 h-3" />
             <span>{readTime} 分钟阅读</span>
           </div>
+          {writingStreak > 0 && (
+            <span className="flex items-center gap-1 text-amber-dark">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-dark animate-pulse" />
+              连续写作 {formatWritingStreak()}
+            </span>
+          )}
           {unsavedChanges ? (
             <span className="text-amber-dark flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-dark animate-pulse" />
@@ -759,10 +1064,10 @@ function ArticleEditor() {
         <div className="flex items-center gap-2 text-muted-foreground">
           <span className="px-1.5 py-0.5 rounded bg-muted font-mono text-[10px]">Ctrl+B</span>
           <span>加粗</span>
-          <span className="px-1.5 py-0.5 rounded bg-muted font-mono text-[10px]">Ctrl+I</span>
-          <span>斜体</span>
           <span className="px-1.5 py-0.5 rounded bg-muted font-mono text-[10px]">Ctrl+S</span>
           <span>保存</span>
+          <span className="px-1.5 py-0.5 rounded bg-muted font-mono text-[10px]">Ctrl+O</span>
+          <span>导入</span>
         </div>
       </div>
 
@@ -779,7 +1084,7 @@ function ArticleEditor() {
           className="flex flex-col items-center gap-1 px-4 py-1 text-muted-foreground transition-colors hover:text-amber-dark"
           onClick={() => setMobileView(mobileView === 'editor' ? 'preview' : 'editor')}
         >
-          {mobileView === 'preview' ? <Code className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+          {mobileView === 'preview' ? <FileCode2 className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
           <span className="text-xs">{mobileView === 'preview' ? '编辑' : '预览'}</span>
         </button>
         <button

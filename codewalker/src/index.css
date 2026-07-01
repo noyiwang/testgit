@@ -1,3 +1,5 @@
+@import 'highlight.js/styles/github-dark.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -233,10 +235,26 @@
     @apply font-mono text-sm bg-muted text-primary px-1.5 py-0.5 rounded;
   }
   .preview-content pre {
-    @apply bg-code-bg text-code-text rounded-large p-5 my-4 overflow-x-auto font-mono text-sm leading-[1.7];
+    @apply bg-code-bg text-code-text rounded-large p-0 my-4 overflow-x-auto font-mono text-sm leading-[1.7];
   }
   .preview-content pre code {
-    @apply bg-transparent text-inherit p-0 rounded-none;
+    @apply bg-transparent text-inherit p-0 rounded-none block p-4;
+  }
+  .code-block-wrapper pre {
+    @apply !rounded-t-none;
+  }
+  .code-block-wrapper {
+    @apply rounded-large overflow-hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  .copy-code-btn {
+    @apply cursor-pointer;
+  }
+  .task-list-item {
+    @apply flex items-start gap-2;
+  }
+  .task-list-item input[type="checkbox"] {
+    @apply mt-1 shrink-0;
   }
   .preview-content blockquote {
     @apply border-l-[3px] border-primary bg-amber/10 px-4 py-3 my-4 rounded-r-large text-muted-foreground italic;

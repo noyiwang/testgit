@@ -167,7 +167,7 @@ function AdminArticles() {
                 <p className="text-sm mt-1 whitespace-nowrap text-muted-foreground">共 {total} 篇文章</p>
               </div>
               <Link
-                to="/admin/articles/new"
+                to="/admin/editor/new"
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold text-white whitespace-nowrap transition-opacity hover:opacity-90 shrink-0 bg-amber"
               >
                 <Plus className="w-4 h-4" />
@@ -305,7 +305,7 @@ function AdminArticles() {
                           </td>
                           <td className="px-4 py-3.5">
                             <Link
-                              to={`/admin/articles/edit/${article.id}`}
+                              to={`/admin/editor/${article.id}`}
                               className="block text-sm font-semibold truncate transition-colors text-brown-dark hover:text-amber-dark"
                             >
                               {article.title}
@@ -329,7 +329,7 @@ function AdminArticles() {
                           </td>
                           <td className="px-4 py-3.5">
                             <div className="flex items-center justify-center gap-1">
-                              <button className="action-btn" title="编辑" onClick={() => navigate(`/admin/articles/edit/${article.id}`)}>
+                              <button className="action-btn" title="编辑" onClick={() => navigate(`/admin/editor/${article.id}`)}>
                                 <Pencil className="w-4 h-4" />
                               </button>
                               <Link to={`/blog/${article.id}`} className="action-btn" title="预览">
@@ -399,7 +399,7 @@ function AdminArticles() {
                   drafts.map((d, idx) => (
                     <Link
                       key={d.id || idx}
-                      to={`/admin/articles/edit/${d.id}`}
+                      to={`/admin/editor/${d.id}`}
                       className="flex items-center justify-between py-2.5 text-sm text-muted-foreground transition-colors hover:text-amber-dark border-b border-warm-border last:border-b-0"
                     >
                       <span className="truncate mr-2">{d.title}</span>
