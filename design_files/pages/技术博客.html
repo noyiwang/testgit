@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>技术博客 - 码上行</title>
+    <style id="theme-vars">
+/* ============================================
+   码上行 (CodeWalker) Brand Tokens
+   Warm Humanistic Tech — Cream, Amber, Serif
+   ============================================ */
+:root {
+  /* Backgrounds */
+  --brand-background: #FFFBF5;
+  --brand-muted: #F5EDE0;
+  --brand-card: #FFFFFF;
+  --brand-card-hover: #FFF9F0;
+
+  /* Text */
+  --brand-foreground: #2C1810;
+  --brand-foreground-secondary: #6B5344;
+  --brand-foreground-muted: #9C8577;
+
+  /* Accent */
+  --brand-primary: #C8820C;
+  --brand-primary-light: #F5D699;
+  --brand-primary-dark: #9A6309;
+
+  /* Borders */
+  --brand-border: #E8DDD0;
+  --brand-border-light: #F0E8DC;
+
+  /* Shadows */
+  --brand-shadow-sm: 0 1px 3px rgba(44,24,16,0.06);
+  --brand-shadow-md: 0 4px 12px rgba(44,24,16,0.08);
+
+  /* Typography */
+  --font-serif: 'Georgia', 'Noto Serif SC', serif;
+  --font-sans: 'Inter', 'Noto Sans SC', system-ui, sans-serif;
+  --font-code: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', monospace;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Spacing */
+  --section-padding: 80px;
+  --container-max: 1200px;
+}
+
+.dark {
+  --brand-background: #1A1410;
+  --brand-muted: #2A2018;
+  --brand-card: #242018;
+  --brand-card-hover: #2E2820;
+  --brand-foreground: #F0E8DC;
+  --brand-foreground-secondary: #BBA898;
+  --brand-foreground-muted: #8A7768;
+  --brand-primary: #F5C24C;
+  --brand-primary-light: #3D3018;
+  --brand-primary-dark: #E5A820;
+  --brand-border: #3D3228;
+  --brand-border-light: #302820;
+  --brand-shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
+  --brand-shadow-md: 0 4px 12px rgba(0,0,0,0.3);
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+
+  @layer base {
+    body {
+      background: var(--brand-background);
+      color: var(--brand-foreground);
+      font-family: var(--font-sans);
+    }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+
+  @theme inline {
+    --color-primary: var(--brand-primary);
+    --color-primary-light: var(--brand-primary-light);
+    --color-primary-dark: var(--brand-primary-dark);
+    --color-foreground: var(--brand-foreground);
+    --color-foreground-secondary: var(--brand-foreground-secondary);
+    --color-foreground-muted: var(--brand-foreground-muted);
+    --color-muted: var(--brand-muted);
+    --color-card: var(--brand-card);
+    --color-card-hover: var(--brand-card-hover);
+    --color-border: var(--brand-border);
+    --color-border-light: var(--brand-border-light);
+    --color-background: var(--brand-background);
+  }
+
+  @layer components {
+    .font-serif { font-family: var(--font-serif); }
+    .font-code { font-family: var(--font-code); }
+    .container-brand { max-width: var(--container-max); margin-left: auto; margin-right: auto; }
+    .section-padding { padding-top: var(--section-padding); padding-bottom: var(--section-padding); }
+
+    .nav-link {
+      color: var(--brand-foreground-muted);
+      transition: color 0.2s;
+      position: relative;
+      padding-bottom: 2px;
+    }
+    .nav-link:hover { color: var(--brand-primary); }
+    .nav-link.active {
+      color: var(--brand-primary);
+      font-weight: 600;
+    }
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--brand-primary);
+      border-radius: 1px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--brand-primary);
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .btn-primary:hover {
+      background: var(--brand-primary-dark);
+      box-shadow: var(--brand-shadow-md);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--brand-primary);
+      border: 1.5px solid var(--brand-primary);
+      padding: 10px 22px;
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .btn-outline:hover {
+      background: var(--brand-primary);
+      color: #fff;
+    }
+
+    .card-base {
+      background: var(--brand-card);
+      border: 1px solid var(--brand-border-light);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--brand-shadow-sm);
+      transition: all 0.25s ease;
+    }
+    .card-base:hover {
+      box-shadow: var(--brand-shadow-md);
+      transform: translateY(-3px);
+      border-color: var(--brand-border);
+    }
+
+    .tag-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+      background: var(--brand-muted);
+      color: var(--brand-foreground-secondary);
+      transition: all 0.2s;
+    }
+    .tag-pill:hover {
+      background: var(--brand-primary-light);
+      color: var(--brand-primary-dark);
+    }
+    .tag-pill.active {
+      background: var(--brand-primary);
+      color: #fff;
+    }
+    .tag-pill.active:hover {
+      background: var(--brand-primary-dark);
+      color: #fff;
+    }
+
+    .category-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+      background: var(--brand-primary-light);
+      color: var(--brand-primary-dark);
+      letter-spacing: 0.02em;
+    }
+
+    .featured-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      background: var(--brand-primary);
+      color: #fff;
+      letter-spacing: 0.03em;
+    }
+
+    .search-input {
+      background: var(--brand-card);
+      border: 1.5px solid var(--brand-border);
+      border-radius: var(--radius-md);
+      padding: 10px 16px 10px 42px;
+      font-size: 14px;
+      color: var(--brand-foreground);
+      transition: all 0.2s;
+      outline: none;
+      width: 100%;
+    }
+    .search-input::placeholder {
+      color: var(--brand-foreground-muted);
+    }
+    .search-input:focus {
+      border-color: var(--brand-primary);
+      box-shadow: 0 0 0 3px rgba(200,130,12,0.12);
+    }
+
+    .sidebar-tag {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      white-space: nowrap;
+      background: var(--brand-muted);
+      color: var(--brand-foreground-secondary);
+      transition: all 0.2s;
+    }
+    .sidebar-tag:hover {
+      background: var(--brand-primary-light);
+      color: var(--brand-primary-dark);
+    }
+
+    .pagination-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 40px;
+      height: 40px;
+      padding: 0 12px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--brand-foreground-secondary);
+      background: var(--brand-card);
+      border: 1px solid var(--brand-border-light);
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .pagination-btn:hover {
+      border-color: var(--brand-primary);
+      color: var(--brand-primary);
+      background: var(--brand-card-hover);
+    }
+    .pagination-btn.active {
+      background: var(--brand-primary);
+      color: #fff;
+      border-color: var(--brand-primary);
+    }
+    .pagination-btn.active:hover {
+      background: var(--brand-primary-dark);
+      color: #fff;
+    }
+
+    .sidebar-article-link {
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      transition: all 0.2s;
+    }
+    .sidebar-article-link:hover {
+      background: var(--brand-card-hover);
+    }
+  }
+
+  @layer utilities {
+    .text-balance {
+      text-wrap: balance;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+  }
+
+    </style>
+</head>
+<body>
+<main>
+
+  <!-- ====== Top Navigation Bar ====== -->
+  <nav class="w-full border-b" style="border-color: var(--brand-border-light); background: var(--brand-background);">
+    <div class="container-brand flex items-center justify-between px-5 sm:px-8 py-4">
+      <a href="index.html" class="font-serif text-xl sm:text-2xl font-bold" style="color: var(--brand-foreground); text-decoration: none;">
+        码上行
+      </a>
+      <div class="flex items-center gap-5 sm:gap-8">
+        <a href="index.html" class="nav-link hidden sm:inline text-sm" data-dom-id="nav-index">首页</a>
+        <a href="blog.html" class="nav-link active text-sm" data-dom-id="nav-blog">技术博客</a>
+        <a href="courses.html" class="nav-link hidden sm:inline text-sm" data-dom-id="nav-courses">教学课程</a>
+        <a href="projects.html" class="nav-link hidden sm:inline text-sm" data-dom-id="nav-projects">开源作品</a>
+        <a href="about.html" class="nav-link hidden sm:inline text-sm" data-dom-id="nav-about">关于我</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ====== Page Header ====== -->
+  <section class="w-full" style="background: var(--brand-muted);">
+    <div class="container-brand px-5 sm:px-8 py-12 sm:py-16">
+      <h1 class="font-serif text-balance" style="font-size: clamp(28px, 4vw, 48px); font-weight: 700; color: var(--brand-foreground); margin: 0 0 12px 0;">
+        技术博客
+      </h1>
+      <p class="text-base sm:text-lg max-w-2xl" style="color: var(--brand-foreground-secondary); margin: 0 0 16px 0; line-height: 1.7;">
+        记录思考，分享洞见，与社区一起成长
+      </p>
+      <p class="text-sm whitespace-nowrap" style="color: var(--brand-foreground-muted);">
+        128 篇文章
+      </p>
+    </div>
+  </section>
+
+  <!-- ====== Main Content Area ====== -->
+  <section class="container-brand px-5 sm:px-8 pt-8 sm:pt-10 pb-16 sm:pb-20">
+    <div class="flex flex-col lg:flex-row gap-8 lg:gap-10">
+
+      <!-- ====== Left: Main Column ====== -->
+      <div class="flex-1 min-w-0">
+
+        <!-- Search + Filter Bar -->
+        <div class="mb-8">
+          <!-- Search -->
+          <div class="relative mb-5">
+            <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style="color: var(--brand-foreground-muted);"></i>
+            <input type="text" class="search-input" placeholder="搜索文章...">
+          </div>
+          <!-- Category Filter Pills -->
+          <div class="flex flex-nowrap overflow-x-auto gap-2 pb-1">
+            <span class="tag-pill active">全部</span>
+            <span class="tag-pill">分布式系统</span>
+            <span class="tag-pill">前端工程</span>
+            <span class="tag-pill">Go语言</span>
+            <span class="tag-pill">开源实践</span>
+            <span class="tag-pill">云原生</span>
+            <span class="tag-pill">架构设计</span>
+          </div>
+        </div>
+
+        <!-- ====== Featured Article (Full-Width Card) ====== -->
+        <a href="blog-detail.html" class="card-base block overflow-hidden mb-8" data-dom-id="link-blog-detail" style="text-decoration: none; color: inherit;">
+          <div class="flex flex-col md:flex-row">
+            <!-- Thumbnail (60% on desktop) -->
+            <div class="md:w-[60%] flex-shrink-0">
+              <img src="../assets/image_2_yi19x4.jpg" alt="Featured article thumbnail"
+                   class="w-full h-48 sm:h-56 md:h-full object-cover" loading="lazy">
+            </div>
+            <!-- Content (40% on desktop) -->
+            <div class="flex-1 min-w-0 p-5 sm:p-6 md:p-8 flex flex-col justify-center">
+              <div class="flex items-center gap-3 mb-3">
+                <span class="featured-badge">
+                  <i data-lucide="star" class="w-3.5 h-3.5"></i>
+                  精选文章
+                </span>
+              </div>
+              <h2 class="font-serif text-xl sm:text-2xl font-bold mb-3" style="color: var(--brand-foreground); line-height: 1.4;">
+                深入理解 Go 语言并发模型：从 Goroutine 到 Channel
+              </h2>
+              <p class="text-sm leading-relaxed mb-5" style="color: var(--brand-foreground-secondary); line-height: 1.7; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                并发编程是现代软件工程中不可或缺的核心能力。本文从 Go 语言的 Goroutine 调度器 GMP 模型出发，深入剖析 Channel 的底层实现机制，并结合实际生产案例，探讨如何设计高并发系统架构，以及在分布式场景下如何正确处理竞态条件与资源同步问题。
+              </p>
+              <div class="flex items-center gap-3 flex-shrink-0">
+                <img src="../assets/image_0_yi19x4.jpg" alt="Author avatar" class="w-8 h-8 rounded-full object-cover">
+                <span class="text-sm font-medium whitespace-nowrap" style="color: var(--brand-foreground);">码上行</span>
+                <span class="text-xs whitespace-nowrap" style="color: var(--brand-foreground-muted);">2025-06-28</span>
+                <span class="text-xs whitespace-nowrap" style="color: var(--brand-foreground-muted);">15 分钟阅读</span>
+              </div>
+            </div>
+          </div>
+        </a>
+
+        <!-- ====== Article Grid (2 columns, 6 articles) ====== -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+
+          <!-- Article Card 1 -->
+          <a href="blog-detail.html" class="card-base block overflow-hidden" data-dom-id="link-blog-detail" style="text-decoration: none; color: inherit;">
+            <img src="../assets/image_2_yi19x4.jpg" alt="Article thumbnail"
+                 class="w-full h-44 object-cover" loading="lazy">
+            <div class="p-5">
+              <div class="flex items-center gap-2 mb-2.5">
+                <span class="category-tag">分布式系统</span>
+              </div>
+              <h3 class="font-serif text-base font-bold mb-2 truncate" style="color: var(--brand-foreground); line-height: 1.4;">
+                微服务架构下的服务网格实践指南
+              </h3>
+              <p class="text-xs leading-relaxed mb-3" style="color: var(--brand-foreground-secondary); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                探索 Istio 在 Kubernetes 集群中的落地实践，从流量管理到可观测性的全链路打通经验分享。
+              </p>
+              <div class="flex items-center gap-3 text-xs" style="color: var(--brand-foreground-muted);">
+                <span class="whitespace-nowrap">2025-06-25</span>
+                <span class="whitespace-nowrap">8 分钟阅读</span>
+                <span class="whitespace-nowrap">2.3k 浏览</span>
+              </div>
+            </div>
+          </a>
+
+          <!-- Article Card 2 -->
+          <a href="blog-detail.html" class="card-base block overflow-hidden" data-dom-id="link-blog-detail" style="text-decoration: none; color: inherit;">
+            <div class="w-full h-44 flex items-center justify-center" style="background: linear-gradient(135deg, var(--brand-muted), var(--brand-primary-light));">
+              <i data-lucide="layout" class="w-12 h-12" style="color: var(--brand-primary); opacity: 0.5;"></i>
+            </div>
+            <div class="p-5">
+              <div class="flex items-center gap-2 mb-2.5">
+                <span class="category-tag">前端工程</span>
+              </div>
+              <h3 class="font-serif text-base font-bold mb-2 truncate" style="color: var(--brand-foreground); line-height: 1.4;">
+                React Server Components 深度解析与性能优化
+              </h3>
+              <p class="text-xs leading-relaxed mb-3" style="color: var(--brand-foreground-secondary); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                从 React 编译器视角解析 RSC 的流式渲染机制，以及如何在大型项目中实现首屏加载性能的显著提升。
+              </p>
+              <div class="flex items-center gap-3 text-xs" style="color: var(--brand-foreground-muted);">
+                <span class="whitespace-nowrap">2025-06-22</span>
+                <span class="whitespace-nowrap">12 分钟阅读</span>
+                <span class="whitespace-nowrap">4.1k 浏览</span>
+              </div>
+            </div>
+          </a>
+
+          <!-- Article Card 3 -->
+          <a href="blog-detail.html" class="card-base block overflow-hidden" data-dom-id="link-blog-detail" style="text-decoration: none; color: inherit;">
+            <div class="w-full h-44 flex items-center justify-center" style="background: linear-gradient(135deg, #E8DDD0, #F5D699);">
+              <i data-lucide="code-2" class="w-12 h-12" style="color: var(--brand-primary); opacity: 0.5;"></i>
+            </div>
+            <div class="p-5">
+              <div class="flex items-center gap-2 mb-2.5">
+                <span class="category-tag">Go语言</span>
+              </div>
+              <h3 class="font-serif text-base font-bold mb-2 truncate" style="color: var(--brand-foreground); line-height: 1.4;">
+                Go 泛型实战：从类型约束到设计模式
+              </h3>
+              <p class="text-xs leading-relaxed mb-3" style="color: var(--brand-foreground-secondary); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                Go 1.18 泛型落地三年后的工程实践总结，包含类型约束设计、泛型容器实现与常见陷阱解析。
+              </p>
+              <div class="flex items-center gap-3 text-xs" style="color: var(--brand-foreground-muted);">
+                <span class="whitespace-nowrap">2025-06-18</span>
+                <span class="whitespace-nowrap">10 分钟阅读</span>
+                <span class="whitespace-nowrap">3.7k 浏览</span>
+              </div>
+            </div>
+          </a>
+
+          <!-- Article Card 4 -->
+          <a href="blog-detail.html" class="card-base block overflow-hidden" data-dom-id="link-blog-detail" style="text-decoration: none; color: inherit;">
+            <div class="w-full h-44 flex items-center justify-center" style="background: linear-gradient(135deg, #F0E8DC, #F5EDE0);">
+              <i data-lucide="git-branch" class="w-12 h-12" style="color: var(--brand-primary); opacity: 0.5;"></i>
+            </div>
+            <div class="p-5">
+              <div class="flex items-center gap-2 mb-2.5">
+                <span class="category-tag">开源实践</span>
+              </div>
+              <h3 class="font-serif text-base font-bold mb-2 truncate" style="color: var(--brand-foreground); line-height: 1.4;">
+                如何维护一个健康的技术开源项目
+              </h3>
+              <p class="text-xs leading-relaxed mb-3" style="color: var(--brand-foreground-secondary); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                从 Issue 治理到贡献者文化建设，分享维护上万 Star 开源项目的心得与社区运营经验。
+              </p>
+              <div class="flex items-center gap-3 text-xs" style="color: var(--brand-foreground-muted);">
+                <span class="whitespace-nowrap">2025-06-14</span>
+                <span class="whitespace-nowrap">6 分钟阅读</span>
+                <span class="whitespace-nowrap">5.8k 浏览</span>
+              </div>
+            </div>
+          </a>
+
+          <!-- Article Card 5 -->
+          <a href="blog-detail.html" class="card-base block overflow-hidden" data-dom-id="link-blog-detail" style="text-decoration: none; color: inherit;">
+            <div class="w-full h-44 flex items-center justify-center" style="background: linear-gradient(135deg, #F5D699, #E8DDD0);">
+              <i data-lucide="cloud" class="w-12 h-12" style="color: var(--brand-primary); opacity: 0.5;"></i>
+            </div>
+            <div class="p-5">
+              <div class="flex items-center gap-2 mb-2.5">
+                <span class="category-tag">云原生</span>
+              </div>
+              <h3 class="font-serif text-base font-bold mb-2 truncate" style="color: var(--brand-foreground); line-height: 1.4;">
+                Kubernetes 集群自愈能力设计与故障恢复策略
+              </h3>
+              <p class="text-xs leading-relaxed mb-3" style="color: var(--brand-foreground-secondary); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                从 Pod 调度到节点恢复，系统梳理 K8s 自愈机制的边界与自定义 Operator 扩展方案。
+              </p>
+              <div class="flex items-center gap-3 text-xs" style="color: var(--brand-foreground-muted);">
+                <span class="whitespace-nowrap">2025-06-10</span>
+                <span class="whitespace-nowrap">11 分钟阅读</span>
+                <span class="whitespace-nowrap">3.2k 浏览</span>
+              </div>
+            </div>
+          </a>
+
+          <!-- Article Card 6 -->
+          <a href="blog-detail.html" class="card-base block overflow-hidden" data-dom-id="link-blog-detail" style="text-decoration: none; color: inherit;">
+            <div class="w-full h-44 flex items-center justify-center" style="background: linear-gradient(135deg, #F5EDE0, #F0E8DC);">
+              <i data-lucide="boxes" class="w-12 h-12" style="color: var(--brand-primary); opacity: 0.5;"></i>
+            </div>
+            <div class="p-5">
+              <div class="flex items-center gap-2 mb-2.5">
+                <span class="category-tag">架构设计</span>
+              </div>
+              <h3 class="font-serif text-base font-bold mb-2 truncate" style="color: var(--brand-foreground); line-height: 1.4;">
+                从单体到微服务：渐进式架构演进的实战路径
+              </h3>
+              <p class="text-xs leading-relaxed mb-3" style="color: var(--brand-foreground-secondary); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                避免微服务改造中的常见陷阱，采用绞杀者模式逐步完成系统拆分与领域边界划定。
+              </p>
+              <div class="flex items-center gap-3 text-xs" style="color: var(--brand-foreground-muted);">
+                <span class="whitespace-nowrap">2025-06-06</span>
+                <span class="whitespace-nowrap">9 分钟阅读</span>
+                <span class="whitespace-nowrap">4.5k 浏览</span>
+              </div>
+            </div>
+          </a>
+
+        </div>
+
+        <!-- ====== Pagination ====== -->
+        <div class="flex items-center justify-center gap-2 flex-wrap">
+          <button class="pagination-btn text-xs" disabled style="opacity: 0.4; cursor: default;">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            上一页
+          </button>
+          <button class="pagination-btn active">1</button>
+          <button class="pagination-btn">2</button>
+          <button class="pagination-btn">3</button>
+          <span class="px-1 text-sm" style="color: var(--brand-foreground-muted);">...</span>
+          <button class="pagination-btn">12</button>
+          <button class="pagination-btn text-xs">
+            下一页
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ====== Right: Sidebar (sticky on desktop) ====== -->
+      <aside class="w-full lg:w-[280px] flex-shrink-0">
+        <div class="lg:sticky lg:top-6 flex flex-col gap-7">
+
+          <!-- 热门标签 -->
+          <div class="card-base p-5">
+            <h3 class="font-serif text-sm font-bold mb-4" style="color: var(--brand-foreground);">
+              热门标签
+            </h3>
+            <div class="flex flex-wrap gap-2">
+              <span class="sidebar-tag">Go</span>
+              <span class="sidebar-tag">Kubernetes</span>
+              <span class="sidebar-tag">React</span>
+              <span class="sidebar-tag">微服务</span>
+              <span class="sidebar-tag">Docker</span>
+              <span class="sidebar-tag">gRPC</span>
+              <span class="sidebar-tag">TypeScript</span>
+              <span class="sidebar-tag">Redis</span>
+              <span class="sidebar-tag">Prometheus</span>
+              <span class="sidebar-tag">PostgreSQL</span>
+              <span class="sidebar-tag">CI/CD</span>
+              <span class="sidebar-tag">GraphQL</span>
+            </div>
+          </div>
+
+          <!-- 推荐阅读 -->
+          <div class="card-base p-5">
+            <h3 class="font-serif text-sm font-bold mb-4" style="color: var(--brand-foreground);">
+              推荐阅读
+            </h3>
+            <div class="flex flex-col gap-1">
+              <a href="blog-detail.html" class="sidebar-article-link" data-dom-id="link-blog-detail" style="text-decoration: none; color: inherit;">
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-medium truncate" style="color: var(--brand-foreground); line-height: 1.5;">
+                    分布式事务的终极方案：Saga 模式详解
+                  </p>
+                  <p class="text-xs mt-0.5 whitespace-nowrap" style="color: var(--brand-foreground-muted);">
+                    5.2k 浏览
+                  </p>
+                </div>
+              </a>
+              <a href="blog-detail.html" class="sidebar-article-link" data-dom-id="link-blog-detail" style="text-decoration: none; color: inherit;">
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-medium truncate" style="color: var(--brand-foreground); line-height: 1.5;">
+                    从零搭建高性能 gRPC 服务网关
+                  </p>
+                  <p class="text-xs mt-0.5 whitespace-nowrap" style="color: var(--brand-foreground-muted);">
+                    4.8k 浏览
+                  </p>
+                </div>
+              </a>
+              <a href="blog-detail.html" class="sidebar-article-link" data-dom-id="link-blog-detail" style="text-decoration: none; color: inherit;">
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs font-medium truncate" style="color: var(--brand-foreground); line-height: 1.5;">
+                    前端性能优化清单：2025 年版
+                  </p>
+                  <p class="text-xs mt-0.5 whitespace-nowrap" style="color: var(--brand-foreground-muted);">
+                    6.1k 浏览
+                  </p>
+                </div>
+              </a>
+            </div>
+          </div>
+
+          <!-- RSS 订阅 -->
+          <a href="#" class="btn-outline text-sm justify-center" style="text-decoration: none;">
+            <i data-lucide="rss" class="w-4 h-4"></i>
+            RSS 订阅
+          </a>
+
+        </div>
+      </aside>
+
+    </div>
+  </section>
+
+  <!-- ====== Footer ====== -->
+  <footer class="w-full border-t" style="border-color: var(--brand-border-light); background: var(--brand-muted);">
+    <div class="container-brand px-5 sm:px-8 py-10 sm:py-12">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+        <!-- Brand + Copyright -->
+        <div>
+          <p class="font-serif text-lg font-bold mb-1" style="color: var(--brand-foreground);">码上行</p>
+          <p class="text-xs" style="color: var(--brand-foreground-muted);">
+            &copy; 2025 CodeWalker. All rights reserved.
+          </p>
+        </div>
+        <!-- Links -->
+        <div class="flex items-center gap-5 text-xs" style="color: var(--brand-foreground-muted);">
+          <a href="blog.html" style="color: inherit; text-decoration: none;" class="hover:text-[var(--brand-primary)]">技术博客</a>
+          <a href="courses.html" style="color: inherit; text-decoration: none;" class="hover:text-[var(--brand-primary)]">教学课程</a>
+          <a href="projects.html" style="color: inherit; text-decoration: none;" class="hover:text-[var(--brand-primary)]">开源作品</a>
+          <a href="about.html" style="color: inherit; text-decoration: none;" class="hover:text-[var(--brand-primary)]">关于我</a>
+        </div>
+        <!-- Social -->
+        <div class="flex items-center gap-4">
+          <a href="#" style="color: var(--brand-foreground-muted);" class="hover:text-[var(--brand-primary)] transition-colors">
+            <i data-lucide="github" class="w-5 h-5"></i>
+          </a>
+          <a href="#" style="color: var(--brand-foreground-muted);" class="hover:text-[var(--brand-primary)] transition-colors">
+            <i data-lucide="twitter" class="w-5 h-5"></i>
+          </a>
+          <a href="#" style="color: var(--brand-foreground-muted);" class="hover:text-[var(--brand-primary)] transition-colors">
+            <i data-lucide="mail" class="w-5 h-5"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</main>
+<script>lucide.createIcons();</script>
+</body>
+</html>
