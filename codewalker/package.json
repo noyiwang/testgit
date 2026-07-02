@@ -7,7 +7,14 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dev:all": "bash scripts/dev.sh",
+    "build:all": "bash scripts/build.sh",
+    "start:prod": "bash scripts/start.sh",
+    "docker:build": "bash scripts/docker-build.sh",
+    "docker:up": "bash scripts/docker-start.sh",
+    "docker:down": "bash scripts/docker-stop.sh",
+    "docker:logs": "bash scripts/docker-logs.sh"
   },
   "dependencies": {
     "highlight.js": "^11.11.1",
