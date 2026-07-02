@@ -193,7 +193,7 @@ func (h *ArticleHandler) Like(c *gin.Context) {
 }
 
 func (h *ArticleHandler) Categories(c *gin.Context) {
-	categories, err := h.repo.GetCategories()
+	categories, err := h.repo.GetCategoriesWithCount()
 	if err != nil {
 		response.InternalError(c, "Failed to fetch categories")
 		return

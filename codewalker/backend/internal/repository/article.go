@@ -152,6 +152,22 @@ func (r *ArticleRepository) IncrementLikes(id uint) error {
 	return r.db.Model(&model.Article{}).Where("id = ?", id).Update("likes", gorm.Expr("likes + ?", 1)).Error
 }
 
+type CategoryCount struct {
+	Name  string `json:"name"`
+	Count int64  `json:"count"`
+}
+
+func (r *ArticleRepository) GetCategoriesWithCount() ([]CategoryCount, error) {
+	var results []CategoryCount
+	err := r.db.Model(&model.Article{}).
+		Select("category as name, COUNT(*) as count").
+		Where("status = ? AND category != ?", model.ArticleStatusPublished, "").
+		Group("category").
+		Order("count DESC").
+		Find(&results).Error
+	return results, err
+}
+
 func (r *ArticleRepository) GetCategories() ([]string, error) {
 	var categories []string
 	err := r.db.Model(&model.Article{}).Where("status = ?", model.ArticleStatusPublished).
