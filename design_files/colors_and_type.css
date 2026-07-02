@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Untitled</title>
+    <style id="theme-vars">
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教学课程 - 码上行</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-cream: #FDF6EC;
+    --color-cream-dark: #F5ECD7;
+    --color-amber: #E89B3C;
+    --color-amber-dark: #D4891F;
+    --color-amber-light: #F4C67A;
+    --color-brown-dark: #3D2B1F;
+    --color-brown: #5C4033;
+    --color-brown-light: #8B6F4E;
+    --color-warm-gray: #F9F5F0;
+    --color-warm-border: #E8DFD0;
+    --color-green-diff: #4A8C5C;
+    --color-green-bg: #EBF5EE;
+    --color-red-diff: #C0392B;
+    --color-red-bg: #FDECEA;
+    --color-text-primary: #3D2B1F;
+    --color-text-secondary: #7A6655;
+    --color-text-muted: #A89882;
+    --color-card-bg: #FFFCF7;
+    --color-card-border: #EDE5D8;
+    --font-serif: 'Georgia', 'Noto Serif SC', 'SimSun', serif;
+    --font-sans: 'Inter', 'Noto Sans SC', 'PingFang SC', system-ui, sans-serif;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-2xl: 20px;
+    --radius-3xl: 24px;
+    --shadow-card: 0 2px 12px rgba(61, 43, 31, 0.08);
+    --shadow-card-hover: 0 8px 30px rgba(61, 43, 31, 0.14);
+  }
+  @layer base {
+    body {
+      background: var(--color-cream);
+      color: var(--color-text-primary);
+      font-family: var(--font-sans);
+    }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+      .course-card {
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+      }
+      .course-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-card-hover);
+      }
+      .learning-node {
+        position: relative;
+      }
+      .learning-node::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 100%;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, var(--color-amber), var(--color-amber-light));
+        z-index: 0;
+      }
+      .learning-node:last-child::after {
+        display: none;
+      }
+      .path-line-container {
+        position: relative;
+      }
+      .path-line {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--color-amber), var(--color-amber-light), var(--color-amber));
+        z-index: 0;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main>
+
+        <!-- ====== TOP NAVIGATION BAR ====== -->
+        <nav class="w-full border-b" style="border-color: var(--color-warm-border); background: var(--color-cream);">
+            <div class="max-w-[1200px] mx-auto px-6 py-4 flex items-center justify-between">
+                <a href="../index.html" class="flex items-center gap-2 shrink-0">
+                    <span class="text-2xl font-bold" style="font-family: var(--font-serif); color: var(--color-brown-dark);">码上行</span>
+                </a>
+                <div class="hidden sm:flex items-center gap-8">
+                    <a href="../index.html" data-dom-id="nav-index" class="text-sm font-medium whitespace-nowrap transition-colors hover:opacity-80" style="color: var(--color-text-secondary);">首页</a>
+                    <a href="blog.html" data-dom-id="nav-blog" class="text-sm font-medium whitespace-nowrap transition-colors hover:opacity-80" style="color: var(--color-text-secondary);">技术博客</a>
+                    <a href="courses.html" data-dom-id="nav-courses" class="text-sm font-bold whitespace-nowrap" style="color: var(--color-amber-dark); border-bottom: 2px solid var(--color-amber); padding-bottom: 2px;">教学课程</a>
+                    <a href="projects.html" data-dom-id="nav-projects" class="text-sm font-medium whitespace-nowrap transition-colors hover:opacity-80" style="color: var(--color-text-secondary);">开源项目</a>
+                    <a href="about.html" data-dom-id="nav-about" class="text-sm font-medium whitespace-nowrap transition-colors hover:opacity-80" style="color: var(--color-text-secondary);">关于我</a>
+                </div>
+                <!-- Mobile menu button -->
+                <button class="sm:hidden shrink-0" style="color: var(--color-brown);">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <!-- Mobile nav -->
+            <div class="sm:hidden px-6 pb-4 flex flex-wrap gap-4">
+                <a href="../index.html" data-dom-id="nav-index" class="text-sm whitespace-nowrap" style="color: var(--color-text-secondary);">首页</a>
+                <a href="blog.html" data-dom-id="nav-blog" class="text-sm whitespace-nowrap" style="color: var(--color-text-secondary);">技术博客</a>
+                <a href="courses.html" data-dom-id="nav-courses" class="text-sm font-bold whitespace-nowrap" style="color: var(--color-amber-dark);">教学课程</a>
+                <a href="projects.html" data-dom-id="nav-projects" class="text-sm whitespace-nowrap" style="color: var(--color-text-secondary);">开源项目</a>
+                <a href="about.html" data-dom-id="nav-about" class="text-sm whitespace-nowrap" style="color: var(--color-text-secondary);">关于我</a>
+            </div>
+        </nav>
+
+        <!-- ====== PAGE HEADER ====== -->
+        <section class="pt-16 pb-12 px-6" style="background: var(--color-cream);">
+            <div class="max-w-[1200px] mx-auto text-center">
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6" style="font-family: var(--font-serif); color: var(--color-brown-dark); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">
+                    教学课程
+                </h1>
+                <p class="text-lg sm:text-xl mb-10 max-w-2xl mx-auto" style="color: var(--color-text-secondary);">
+                    从入门到实战，系统掌握核心技术栈
+                </p>
+                <!-- Stats Bar -->
+                <div class="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
+                    <div class="flex items-center gap-2 whitespace-nowrap">
+                        <i data-lucide="book-open" class="w-5 h-5" style="color: var(--color-amber);"></i>
+                        <span class="text-sm font-semibold" style="color: var(--color-text-primary);">12 门课程</span>
+                    </div>
+                    <div class="w-px h-5 hidden sm:block" style="background: var(--color-warm-border);"></div>
+                    <div class="flex items-center gap-2 whitespace-nowrap">
+                        <i data-lucide="users" class="w-5 h-5" style="color: var(--color-amber);"></i>
+                        <span class="text-sm font-semibold" style="color: var(--color-text-primary);">5,200+ 学员</span>
+                    </div>
+                    <div class="w-px h-5 hidden sm:block" style="background: var(--color-warm-border);"></div>
+                    <div class="flex items-center gap-2 whitespace-nowrap">
+                        <i data-lucide="star" class="w-5 h-5" style="color: var(--color-amber);"></i>
+                        <span class="text-sm font-semibold" style="color: var(--color-text-primary);">98% 好评率</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====== FEATURED COURSE BANNER ====== -->
+        <section class="px-6 pb-16" style="background: var(--color-cream);">
+            <div class="max-w-[1200px] mx-auto">
+                <div class="relative overflow-hidden rounded-2xl" style="box-shadow: var(--shadow-card-hover);">
+                    <!-- Background Image -->
+                    <img src="../assets/course-illustration.jpg" alt="课程封面" class="absolute inset-0 w-full h-full object-cover">
+                    <!-- Dark Overlay -->
+                    <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30"></div>
+                    <!-- Content -->
+                    <div class="relative z-10 p-8 sm:p-12 lg:p-16 flex flex-col lg:flex-row items-start lg:items-center gap-8">
+                        <div class="flex-1 min-w-0">
+                            <!-- Badge -->
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold whitespace-nowrap mb-5" style="background: var(--color-amber); color: #fff;">
+                                <i data-lucide="award" class="w-3.5 h-3.5"></i>
+                                推荐课程
+                            </span>
+                            <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4" style="font-family: var(--font-serif); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">
+                                Go 语言微服务架构实战
+                            </h2>
+                            <p class="text-base sm:text-lg mb-6 max-w-2xl" style="color: rgba(255,255,255,0.85);">
+                                从零构建生产级微服务系统，涵盖服务拆分、gRPC通信、链路追踪、容器化部署全流程
+                            </p>
+                            <!-- Meta Row -->
+                            <div class="flex flex-wrap items-center gap-4 mb-8">
+                                <span class="inline-flex items-center gap-1.5 text-sm text-white/80 whitespace-nowrap">
+                                    <i data-lucide="play-circle" class="w-4 h-4"></i>
+                                    36课时
+                                </span>
+                                <span class="inline-flex items-center gap-1.5 text-sm text-white/80 whitespace-nowrap">
+                                    <i data-lucide="signal" class="w-4 h-4"></i>
+                                    中级难度
+                                </span>
+                                <span class="inline-flex items-center gap-1.5 text-sm text-white/80 whitespace-nowrap">
+                                    <i data-lucide="star" class="w-4 h-4" style="color: var(--color-amber-light);"></i>
+                                    4.9分
+                                </span>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-4">
+                                <a href="#" class="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-base font-bold text-white whitespace-nowrap transition-opacity hover:opacity-90" style="background: var(--color-amber); color: #fff;">
+                                    立即学习
+                                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                </a>
+                                <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium text-white/90 whitespace-nowrap" style="background: rgba(255,255,255,0.15);">
+                                    <i data-lucide="users" class="w-4 h-4"></i>
+                                    1,200+ 人已学习
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====== COURSE GRID ====== -->
+        <section class="px-6 py-16" style="background: var(--color-warm-gray);">
+            <div class="max-w-[1200px] mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+
+                    <!-- Course Card 1: Go 语言基础入门 -->
+                    <div class="course-card rounded-2xl overflow-hidden" style="background: var(--color-card-bg); border: 1px solid var(--color-card-border); box-shadow: var(--shadow-card);">
+                        <!-- Card Illustration -->
+                        <div class="relative h-44 overflow-hidden" style="background: linear-gradient(135deg, #4A8C5C 0%, #6BBF7B 50%, #A8E6B0 100%);">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i data-lucide="code-2" class="w-16 h-16 text-white/30"></i>
+                            </div>
+                            <!-- Difficulty Badge -->
+                            <span class="absolute top-3 left-3 inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold whitespace-nowrap" style="background: var(--color-green-bg); color: var(--color-green-diff);">
+                                入门
+                            </span>
+                            <!-- Price Badge -->
+                            <span class="absolute top-3 right-3 inline-flex items-center px-3 py-1 rounded-lg text-sm font-bold whitespace-nowrap" style="background: rgba(255,255,255,0.95); color: var(--color-green-diff);">
+                                免费
+                            </span>
+                        </div>
+                        <!-- Card Content -->
+                        <div class="p-5">
+                            <h3 class="text-lg font-bold mb-2 truncate" style="font-family: var(--font-serif); color: var(--color-brown-dark);">
+                                Go 语言基础入门
+                            </h3>
+                            <p class="text-sm mb-4 line-clamp-2" style="color: var(--color-text-secondary);">
+                                从零开始学习 Go 语言，掌握基础语法、数据类型、函数、并发编程等核心概念
+                            </p>
+                            <!-- Bottom Meta -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <span class="inline-flex items-center gap-1 text-xs whitespace-nowrap" style="color: var(--color-text-muted);">
+                                        <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                                        24课时
+                                    </span>
+                                    <span class="inline-flex items-center gap-1 text-xs whitespace-nowrap" style="color: var(--color-text-muted);">
+                                        <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                                        18小时
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-0.5">
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                </div>
+                            </div>
+                            <!-- Tags -->
+                            <div class="flex flex-wrap gap-2 mt-4">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs whitespace-nowrap" style="background: var(--color-cream); color: var(--color-text-secondary);">Go</span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs whitespace-nowrap" style="background: var(--color-cream); color: var(--color-text-secondary);">并发</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Course Card 2: TypeScript 全栈开发 -->
+                    <div class="course-card rounded-2xl overflow-hidden" style="background: var(--color-card-bg); border: 1px solid var(--color-card-border); box-shadow: var(--shadow-card);">
+                        <div class="relative h-44 overflow-hidden" style="background: linear-gradient(135deg, #3178C6 0%, #519AE8 50%, #89C4F4 100%);">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i data-lucide="layout" class="w-16 h-16 text-white/30"></i>
+                            </div>
+                            <span class="absolute top-3 left-3 inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold whitespace-nowrap" style="background: #FFF3E0; color: var(--color-amber-dark);">
+                                中级
+                            </span>
+                            <span class="absolute top-3 right-3 inline-flex items-center px-3 py-1 rounded-lg text-sm font-bold whitespace-nowrap" style="background: rgba(255,255,255,0.95); color: var(--color-brown-dark);">
+                                ¥199
+                            </span>
+                        </div>
+                        <div class="p-5">
+                            <h3 class="text-lg font-bold mb-2 truncate" style="font-family: var(--font-serif); color: var(--color-brown-dark);">
+                                TypeScript 全栈开发
+                            </h3>
+                            <p class="text-sm mb-4 line-clamp-2" style="color: var(--color-text-secondary);">
+                                基于 Node.js + React 打造全栈应用，涵盖类型系统、API 设计、前后端联调
+                            </p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <span class="inline-flex items-center gap-1 text-xs whitespace-nowrap" style="color: var(--color-text-muted);">
+                                        <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                                        32课时
+                                    </span>
+                                    <span class="inline-flex items-center gap-1 text-xs whitespace-nowrap" style="color: var(--color-text-muted);">
+                                        <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                                        28小时
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-0.5">
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2 mt-4">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs whitespace-nowrap" style="background: var(--color-cream); color: var(--color-text-secondary);">TypeScript</span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs whitespace-nowrap" style="background: var(--color-cream); color: var(--color-text-secondary);">React</span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs whitespace-nowrap" style="background: var(--color-cream); color: var(--color-text-secondary);">Node.js</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Course Card 3: Docker 与 Kubernetes 实战 -->
+                    <div class="course-card rounded-2xl overflow-hidden" style="background: var(--color-card-bg); border: 1px solid var(--color-card-border); box-shadow: var(--shadow-card);">
+                        <div class="relative h-44 overflow-hidden" style="background: linear-gradient(135deg, #2496ED 0%, #38BDF8 50%, #7DD3FC 100%);">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i data-lucide="container" class="w-16 h-16 text-white/30"></i>
+                            </div>
+                            <span class="absolute top-3 left-3 inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold whitespace-nowrap" style="background: #FFF3E0; color: var(--color-amber-dark);">
+                                中级
+                            </span>
+                            <span class="absolute top-3 right-3 inline-flex items-center px-3 py-1 rounded-lg text-sm font-bold whitespace-nowrap" style="background: rgba(255,255,255,0.95); color: var(--color-brown-dark);">
+                                ¥299
+                            </span>
+                        </div>
+                        <div class="p-5">
+                            <h3 class="text-lg font-bold mb-2 truncate" style="font-family: var(--font-serif); color: var(--color-brown-dark);">
+                                Docker 与 Kubernetes 实战
+                            </h3>
+                            <p class="text-sm mb-4 line-clamp-2" style="color: var(--color-text-secondary);">
+                                深入容器化技术，从 Docker 镜像构建到 K8s 集群编排与运维管理
+                            </p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <span class="inline-flex items-center gap-1 text-xs whitespace-nowrap" style="color: var(--color-text-muted);">
+                                        <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                                        40课时
+                                    </span>
+                                    <span class="inline-flex items-center gap-1 text-xs whitespace-nowrap" style="color: var(--color-text-muted);">
+                                        <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                                        35小时
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-0.5">
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2 mt-4">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs whitespace-nowrap" style="background: var(--color-cream); color: var(--color-text-secondary);">Docker</span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs whitespace-nowrap" style="background: var(--color-cream); color: var(--color-text-secondary);">Kubernetes</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Course Card 4: 分布式系统设计模式 -->
+                    <div class="course-card rounded-2xl overflow-hidden" style="background: var(--color-card-bg); border: 1px solid var(--color-card-border); box-shadow: var(--shadow-card);">
+                        <div class="relative h-44 overflow-hidden" style="background: linear-gradient(135deg, #7C3AED 0%, #A78BFA 50%, #C4B5FD 100%);">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i data-lucide="network" class="w-16 h-16 text-white/30"></i>
+                            </div>
+                            <span class="absolute top-3 left-3 inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold whitespace-nowrap" style="background: var(--color-red-bg); color: var(--color-red-diff);">
+                                高级
+                            </span>
+                            <span class="absolute top-3 right-3 inline-flex items-center px-3 py-1 rounded-lg text-sm font-bold whitespace-nowrap" style="background: rgba(255,255,255,0.95); color: var(--color-brown-dark);">
+                                ¥399
+                            </span>
+                        </div>
+                        <div class="p-5">
+                            <h3 class="text-lg font-bold mb-2 truncate" style="font-family: var(--font-serif); color: var(--color-brown-dark);">
+                                分布式系统设计模式
+                            </h3>
+                            <p class="text-sm mb-4 line-clamp-2" style="color: var(--color-text-secondary);">
+                                系统学习分布式核心理论，包括 CAP 定理、一致性协议、消息队列与缓存策略
+                            </p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <span class="inline-flex items-center gap-1 text-xs whitespace-nowrap" style="color: var(--color-text-muted);">
+                                        <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                                        48课时
+                                    </span>
+                                    <span class="inline-flex items-center gap-1 text-xs whitespace-nowrap" style="color: var(--color-text-muted);">
+                                        <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                                        42小时
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-0.5">
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2 mt-4">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs whitespace-nowrap" style="background: var(--color-cream); color: var(--color-text-secondary);">分布式</span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs whitespace-nowrap" style="background: var(--color-cream); color: var(--color-text-secondary);">架构设计</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Course Card 5: Rust 系统编程入门 -->
+                    <div class="course-card rounded-2xl overflow-hidden" style="background: var(--color-card-bg); border: 1px solid var(--color-card-border); box-shadow: var(--shadow-card);">
+                        <div class="relative h-44 overflow-hidden" style="background: linear-gradient(135deg, #CE422B 0%, #E8614D 50%, #F09E93 100%);">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i data-lucide="cpu" class="w-16 h-16 text-white/30"></i>
+                            </div>
+                            <span class="absolute top-3 left-3 inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold whitespace-nowrap" style="background: var(--color-green-bg); color: var(--color-green-diff);">
+                                入门
+                            </span>
+                            <span class="absolute top-3 right-3 inline-flex items-center px-3 py-1 rounded-lg text-sm font-bold whitespace-nowrap" style="background: rgba(255,255,255,0.95); color: var(--color-green-diff);">
+                                免费
+                            </span>
+                        </div>
+                        <div class="p-5">
+                            <h3 class="text-lg font-bold mb-2 truncate" style="font-family: var(--font-serif); color: var(--color-brown-dark);">
+                                Rust 系统编程入门
+                            </h3>
+                            <p class="text-sm mb-4 line-clamp-2" style="color: var(--color-text-secondary);">
+                                理解所有权与借用机制，用 Rust 编写高性能、内存安全的系统级程序
+                            </p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <span class="inline-flex items-center gap-1 text-xs whitespace-nowrap" style="color: var(--color-text-muted);">
+                                        <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                                        28课时
+                                    </span>
+                                    <span class="inline-flex items-center gap-1 text-xs whitespace-nowrap" style="color: var(--color-text-muted);">
+                                        <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                                        22小时
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-0.5">
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-warm-border);"></i>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2 mt-4">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs whitespace-nowrap" style="background: var(--color-cream); color: var(--color-text-secondary);">Rust</span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs whitespace-nowrap" style="background: var(--color-cream); color: var(--color-text-secondary);">系统编程</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Course Card 6: 云原生可观测性实践 -->
+                    <div class="course-card rounded-2xl overflow-hidden" style="background: var(--color-card-bg); border: 1px solid var(--color-card-border); box-shadow: var(--shadow-card);">
+                        <div class="relative h-44 overflow-hidden" style="background: linear-gradient(135deg, #059669 0%, #34D399 50%, #6EE7B7 100%);">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i data-lucide="activity" class="w-16 h-16 text-white/30"></i>
+                            </div>
+                            <span class="absolute top-3 left-3 inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold whitespace-nowrap" style="background: var(--color-red-bg); color: var(--color-red-diff);">
+                                高级
+                            </span>
+                            <span class="absolute top-3 right-3 inline-flex items-center px-3 py-1 rounded-lg text-sm font-bold whitespace-nowrap" style="background: rgba(255,255,255,0.95); color: var(--color-brown-dark);">
+                                ¥249
+                            </span>
+                        </div>
+                        <div class="p-5">
+                            <h3 class="text-lg font-bold mb-2 truncate" style="font-family: var(--font-serif); color: var(--color-brown-dark);">
+                                云原生可观测性实践
+                            </h3>
+                            <p class="text-sm mb-4 line-clamp-2" style="color: var(--color-text-secondary);">
+                                构建 Logs、Metrics、Traces 三位一体的可观测体系，掌握 Prometheus 与 Grafana
+                            </p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <span class="inline-flex items-center gap-1 text-xs whitespace-nowrap" style="color: var(--color-text-muted);">
+                                        <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                                        36课时
+                                    </span>
+                                    <span class="inline-flex items-center gap-1 text-xs whitespace-nowrap" style="color: var(--color-text-muted);">
+                                        <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                                        30小时
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-0.5">
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                                    <i data-lucide="star" class="w-3.5 h-3.5" style="color: var(--color-warm-border);"></i>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2 mt-4">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs whitespace-nowrap" style="background: var(--color-cream); color: var(--color-text-secondary);">Prometheus</span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs whitespace-nowrap" style="background: var(--color-cream); color: var(--color-text-secondary);">Grafana</span>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs whitespace-nowrap" style="background: var(--color-cream); color: var(--color-text-secondary);">云原生</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ====== LEARNING PATH SECTION ====== -->
+        <section class="px-6 py-16" style="background: var(--color-cream);">
+            <div class="max-w-[1200px] mx-auto">
+                <div class="text-center mb-14">
+                    <h2 class="text-3xl sm:text-4xl font-bold mb-4" style="font-family: var(--font-serif); color: var(--color-brown-dark); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">
+                        学习路线图
+                    </h2>
+                    <p class="text-base" style="color: var(--color-text-secondary); max-width: 600px; margin: 0 auto;">
+                        从基础到进阶，清晰的学习路径助你稳步成长
+                    </p>
+                </div>
+
+                <!-- Learning Path Visualization -->
+                <div class="relative px-4 sm:px-8 lg:px-16">
+                    <!-- Connecting Line (desktop) -->
+                    <div class="hidden lg:block absolute top-[52px] left-[10%] right-[10%] h-[3px]" style="background: linear-gradient(90deg, var(--color-amber), var(--color-amber-light), var(--color-amber));"></div>
+                    <!-- Connecting Line (mobile/tablet) - vertical -->
+                    <div class="lg:hidden absolute top-0 bottom-0 left-[28px] w-[3px]" style="background: linear-gradient(180deg, var(--color-amber), var(--color-amber-light), var(--color-amber));"></div>
+
+                    <div class="flex flex-col lg:flex-row lg:justify-between gap-8 lg:gap-0">
+
+                        <!-- Node 1: Go 基础 -->
+                        <div class="flex lg:flex-col items-start lg:items-center gap-4 lg:gap-3 lg:flex-1 relative z-10">
+                            <div class="shrink-0 w-14 h-14 rounded-full flex items-center justify-center border-[3px]" style="background: var(--color-green-diff); border-color: var(--color-green-diff);">
+                                <i data-lucide="check" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div class="min-w-0 lg:text-center">
+                                <h4 class="text-sm font-bold truncate" style="color: var(--color-brown-dark);">Go 基础</h4>
+                                <p class="text-xs truncate" style="color: var(--color-text-muted);">Go 语言基础入门</p>
+                                <span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded text-xs whitespace-nowrap" style="background: var(--color-green-bg); color: var(--color-green-diff);">已完成</span>
+                            </div>
+                        </div>
+
+                        <!-- Node 2: Web 开发 -->
+                        <div class="flex lg:flex-col items-start lg:items-center gap-4 lg:gap-3 lg:flex-1 relative z-10">
+                            <div class="shrink-0 w-14 h-14 rounded-full flex items-center justify-center border-[3px]" style="background: var(--color-amber); border-color: var(--color-amber); box-shadow: 0 0 0 6px rgba(232, 155, 60, 0.2);">
+                                <i data-lucide="play" class="w-6 h-6 text-white"></i>
+                            </div>
+                            <div class="min-w-0 lg:text-center">
+                                <h4 class="text-sm font-bold truncate" style="color: var(--color-brown-dark);">Web 开发</h4>
+                                <p class="text-xs truncate" style="color: var(--color-text-muted);">TypeScript 全栈开发</p>
+                                <span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded text-xs whitespace-nowrap" style="background: #FFF3E0; color: var(--color-amber-dark);">进行中</span>
+                            </div>
+                        </div>
+
+                        <!-- Node 3: 微服务架构 -->
+                        <div class="flex lg:flex-col items-start lg:items-center gap-4 lg:gap-3 lg:flex-1 relative z-10">
+                            <div class="shrink-0 w-14 h-14 rounded-full flex items-center justify-center border-[3px]" style="background: var(--color-cream); border-color: var(--color-amber-light);">
+                                <i data-lucide="lock" class="w-5 h-5" style="color: var(--color-text-muted);"></i>
+                            </div>
+                            <div class="min-w-0 lg:text-center">
+                                <h4 class="text-sm font-bold truncate" style="color: var(--color-brown-dark);">微服务架构</h4>
+                                <p class="text-xs truncate" style="color: var(--color-text-muted);">Go 微服务架构实战</p>
+                                <span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded text-xs whitespace-nowrap" style="background: var(--color-warm-gray); color: var(--color-text-muted);">待开始</span>
+                            </div>
+                        </div>
+
+                        <!-- Node 4: 分布式系统 -->
+                        <div class="flex lg:flex-col items-start lg:items-center gap-4 lg:gap-3 lg:flex-1 relative z-10">
+                            <div class="shrink-0 w-14 h-14 rounded-full flex items-center justify-center border-[3px]" style="background: var(--color-cream); border-color: var(--color-amber-light);">
+                                <i data-lucide="lock" class="w-5 h-5" style="color: var(--color-text-muted);"></i>
+                            </div>
+                            <div class="min-w-0 lg:text-center">
+                                <h4 class="text-sm font-bold truncate" style="color: var(--color-brown-dark);">分布式系统</h4>
+                                <p class="text-xs truncate" style="color: var(--color-text-muted);">分布式系统设计模式</p>
+                                <span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded text-xs whitespace-nowrap" style="background: var(--color-warm-gray); color: var(--color-text-muted);">待开始</span>
+                            </div>
+                        </div>
+
+                        <!-- Node 5: 云原生 -->
+                        <div class="flex lg:flex-col items-start lg:items-center gap-4 lg:gap-3 lg:flex-1 relative z-10">
+                            <div class="shrink-0 w-14 h-14 rounded-full flex items-center justify-center border-[3px]" style="background: var(--color-cream); border-color: var(--color-amber-light);">
+                                <i data-lucide="lock" class="w-5 h-5" style="color: var(--color-text-muted);"></i>
+                            </div>
+                            <div class="min-w-0 lg:text-center">
+                                <h4 class="text-sm font-bold truncate" style="color: var(--color-brown-dark);">云原生</h4>
+                                <p class="text-xs truncate" style="color: var(--color-text-muted);">云原生可观测性实践</p>
+                                <span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded text-xs whitespace-nowrap" style="background: var(--color-warm-gray); color: var(--color-text-muted);">待开始</span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====== TESTIMONIALS SECTION ====== -->
+        <section class="px-6 py-16" style="background: var(--color-warm-gray);">
+            <div class="max-w-[1200px] mx-auto">
+                <div class="text-center mb-14">
+                    <h2 class="text-3xl sm:text-4xl font-bold mb-4" style="font-family: var(--font-serif); color: var(--color-brown-dark); text-wrap: balance; word-break: keep-all; overflow-wrap: break-word;">
+                        学员评价
+                    </h2>
+                    <p class="text-base" style="color: var(--color-text-secondary);">
+                        听听学员们怎么说
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+
+                    <!-- Testimonial 1 -->
+                    <div class="rounded-2xl p-6 sm:p-8" style="background: var(--color-card-bg); border: 1px solid var(--color-card-border); box-shadow: var(--shadow-card);">
+                        <div class="flex items-center gap-0.5 mb-5">
+                            <i data-lucide="star" class="w-4 h-4" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                            <i data-lucide="star" class="w-4 h-4" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                            <i data-lucide="star" class="w-4 h-4" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                            <i data-lucide="star" class="w-4 h-4" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                            <i data-lucide="star" class="w-4 h-4" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                        </div>
+                        <blockquote class="text-base mb-6 line-clamp-4" style="color: var(--color-text-secondary); font-style: italic;">
+                            "这是我见过最好的 Go 语言课程，讲解深入浅出，实战项目非常有价值。从这门课毕业后，我成功转型为后端工程师。"
+                        </blockquote>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background: var(--color-cream-dark);">
+                                <i data-lucide="user" class="w-5 h-5" style="color: var(--color-brown-light);"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-sm font-bold truncate" style="color: var(--color-brown-dark);">张明</p>
+                                <p class="text-xs truncate" style="color: var(--color-text-muted);">后端工程师</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial 2 -->
+                    <div class="rounded-2xl p-6 sm:p-8" style="background: var(--color-card-bg); border: 1px solid var(--color-card-border); box-shadow: var(--shadow-card);">
+                        <div class="flex items-center gap-0.5 mb-5">
+                            <i data-lucide="star" class="w-4 h-4" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                            <i data-lucide="star" class="w-4 h-4" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                            <i data-lucide="star" class="w-4 h-4" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                            <i data-lucide="star" class="w-4 h-4" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                            <i data-lucide="star" class="w-4 h-4" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                        </div>
+                        <blockquote class="text-base mb-6 line-clamp-4" style="color: var(--color-text-secondary); font-style: italic;">
+                            "Docker 和 K8s 课程内容非常系统，跟着做实验就真正理解了容器编排的精髓。现在团队里的容器化方案都是我主导的。"
+                        </blockquote>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background: var(--color-cream-dark);">
+                                <i data-lucide="user" class="w-5 h-5" style="color: var(--color-brown-light);"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-sm font-bold truncate" style="color: var(--color-brown-dark);">李思远</p>
+                                <p class="text-xs truncate" style="color: var(--color-text-muted);">DevOps 工程师</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Testimonial 3 -->
+                    <div class="rounded-2xl p-6 sm:p-8" style="background: var(--color-card-bg); border: 1px solid var(--color-card-border); box-shadow: var(--shadow-card);">
+                        <div class="flex items-center gap-0.5 mb-5">
+                            <i data-lucide="star" class="w-4 h-4" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                            <i data-lucide="star" class="w-4 h-4" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                            <i data-lucide="star" class="w-4 h-4" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                            <i data-lucide="star" class="w-4 h-4" style="color: var(--color-amber); fill: var(--color-amber);"></i>
+                            <i data-lucide="star" class="w-4 h-4" style="color: var(--color-warm-border);"></i>
+                        </div>
+                        <blockquote class="text-base mb-6 line-clamp-4" style="color: var(--color-text-secondary); font-style: italic;">
+                            "作为前端开发者，TypeScript 全栈课程帮我打通了前后端的技术壁垒，现在已经能独立负责全栈项目了。"
+                        </blockquote>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background: var(--color-cream-dark);">
+                                <i data-lucide="user" class="w-5 h-5" style="color: var(--color-brown-light);"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-sm font-bold truncate" style="color: var(--color-brown-dark);">王雨晴</p>
+                                <p class="text-xs truncate" style="color: var(--color-text-muted);">全栈工程师</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ====== FOOTER ====== -->
+        <footer class="px-6 py-12" style="background: var(--color-brown-dark);">
+            <div class="max-w-[1200px] mx-auto">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+                    <!-- Brand Column -->
+                    <div class="sm:col-span-2 lg:col-span-1">
+                        <span class="text-xl font-bold block mb-3" style="font-family: var(--font-serif); color: #F4C67A;">码上行</span>
+                        <p class="text-sm leading-relaxed" style="color: rgba(255,255,255,0.6);">
+                            开源爱好者，专注后端架构与云原生技术，分享技术思考与实践经验。
+                        </p>
+                    </div>
+                    <!-- Quick Links -->
+                    <div>
+                        <h4 class="text-sm font-bold mb-4 whitespace-nowrap" style="color: rgba(255,255,255,0.9);">快速导航</h4>
+                        <div class="flex flex-col gap-2.5">
+                            <a href="../index.html" class="text-sm transition-colors hover:opacity-80" style="color: rgba(255,255,255,0.5);">首页</a>
+                            <a href="blog.html" class="text-sm transition-colors hover:opacity-80" style="color: rgba(255,255,255,0.5);">技术博客</a>
+                            <a href="courses.html" class="text-sm transition-colors hover:opacity-80" style="color: rgba(255,255,255,0.5);">教学课程</a>
+                            <a href="projects.html" class="text-sm transition-colors hover:opacity-80" style="color: rgba(255,255,255,0.5);">开源项目</a>
+                        </div>
+                    </div>
+                    <!-- Resources -->
+                    <div>
+                        <h4 class="text-sm font-bold mb-4 whitespace-nowrap" style="color: rgba(255,255,255,0.9);">学习资源</h4>
+                        <div class="flex flex-col gap-2.5">
+                            <a href="#" class="text-sm transition-colors hover:opacity-80" style="color: rgba(255,255,255,0.5);">Go 入门指南</a>
+                            <a href="#" class="text-sm transition-colors hover:opacity-80" style="color: rgba(255,255,255,0.5);">微服务实战</a>
+                            <a href="#" class="text-sm transition-colors hover:opacity-80" style="color: rgba(255,255,255,0.5);">云原生手册</a>
+                            <a href="#" class="text-sm transition-colors hover:opacity-80" style="color: rgba(255,255,255,0.5);">常见问题</a>
+                        </div>
+                    </div>
+                    <!-- Social -->
+                    <div>
+                        <h4 class="text-sm font-bold mb-4 whitespace-nowrap" style="color: rgba(255,255,255,0.9);">关注我</h4>
+                        <div class="flex items-center gap-3">
+                            <a href="#" class="w-9 h-9 rounded-lg flex items-center justify-center transition-colors" style="background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6);" aria-label="GitHub">
+                                <i data-lucide="github" class="w-4 h-4"></i>
+                            </a>
+                            <a href="#" class="w-9 h-9 rounded-lg flex items-center justify-center transition-colors" style="background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6);" aria-label="Twitter">
+                                <i data-lucide="twitter" class="w-4 h-4"></i>
+                            </a>
+                            <a href="#" class="w-9 h-9 rounded-lg flex items-center justify-center transition-colors" style="background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6);" aria-label="Mail">
+                                <i data-lucide="mail" class="w-4 h-4"></i>
+                            </a>
+                            <a href="#" class="w-9 h-9 rounded-lg flex items-center justify-center transition-colors" style="background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6);" aria-label="RSS">
+                                <i data-lucide="rss" class="w-4 h-4"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Bottom Bar -->
+                <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4" style="border-top: 1px solid rgba(255,255,255,0.1);">
+                    <p class="text-xs whitespace-nowrap" style="color: rgba(255,255,255,0.4);">
+                        &copy; 2024 码上行. All rights reserved.
+                    </p>
+                    <p class="text-xs whitespace-nowrap" style="color: rgba(255,255,255,0.4);">
+                        Built with passion and open source.
+                    </p>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  
+  @layer base {
+    body { background: #ffffff; color: #0f172a; }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main>
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

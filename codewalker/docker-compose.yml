@@ -1,0 +1,62 @@
+services:
+  mysql:
+    image: mysql:8.0-bookworm
+    container_name: codewalker-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: codewalker
+      MYSQL_USER: codewalker
+      MYSQL_PASSWORD: codewalker123
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./backend/migrations/init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - codewalker-net
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: codewalker-app
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: codewalker
+      DB_PASSWORD: codewalker123
+      DB_NAME: codewalker
+      TZ: Asia/Shanghai
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/api/v1/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 15s
+    networks:
+      - codewalker-net
+
+volumes:
+  mysql-data:
+  uploads:
+
+networks:
+  codewalker-net:
+    driver: bridge

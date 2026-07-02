@@ -1,0 +1,408 @@
+{
+  "data": [
+    {
+      "id": "page-index",
+      "title": "首页",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1751328000000,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/index.html",
+        "interactions": [
+          {
+            "domId": "cta-blog",
+            "targetPageId": "page-blog",
+            "transitionLabel": "开始探索"
+          },
+          {
+            "domId": "link-blog",
+            "targetPageId": "page-blog",
+            "transitionLabel": "查看全部文章"
+          },
+          {
+            "domId": "nav-blog",
+            "targetPageId": "page-blog",
+            "hideEdge": true,
+            "transitionLabel": "导航到博客"
+          },
+          {
+            "domId": "nav-courses",
+            "targetPageId": "page-courses",
+            "hideEdge": true,
+            "transitionLabel": "导航到课程"
+          },
+          {
+            "domId": "nav-projects",
+            "targetPageId": "page-projects",
+            "hideEdge": true,
+            "transitionLabel": "导航到作品"
+          },
+          {
+            "domId": "nav-about",
+            "targetPageId": "page-about",
+            "hideEdge": true,
+            "transitionLabel": "导航到关于"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-blog",
+      "title": "技术博客",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1751328000000,
+      "canvasData": {
+        "x": 620,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/blog.html",
+        "interactions": [
+          {
+            "domId": "link-blog-detail",
+            "targetPageId": "page-blog-detail",
+            "transitionLabel": "阅读文章"
+          },
+          {
+            "domId": "nav-index",
+            "targetPageId": "page-index",
+            "hideEdge": true,
+            "transitionLabel": "返回首页"
+          },
+          {
+            "domId": "nav-courses",
+            "targetPageId": "page-courses",
+            "hideEdge": true,
+            "transitionLabel": "导航到课程"
+          },
+          {
+            "domId": "nav-projects",
+            "targetPageId": "page-projects",
+            "hideEdge": true,
+            "transitionLabel": "导航到作品"
+          },
+          {
+            "domId": "nav-about",
+            "targetPageId": "page-about",
+            "hideEdge": true,
+            "transitionLabel": "导航到关于"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-blog-detail",
+      "title": "文章详情",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1751328000000,
+      "canvasData": {
+        "x": 1240,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/blog-detail.html",
+        "interactions": [
+          {
+            "domId": "back-blog",
+            "targetPageId": "page-blog",
+            "hideEdge": true,
+            "transitionLabel": "返回博客列表"
+          },
+          {
+            "domId": "nav-index",
+            "targetPageId": "page-index",
+            "hideEdge": true,
+            "transitionLabel": "返回首页"
+          },
+          {
+            "domId": "nav-blog",
+            "targetPageId": "page-blog",
+            "hideEdge": true,
+            "transitionLabel": "导航到博客"
+          },
+          {
+            "domId": "nav-courses",
+            "targetPageId": "page-courses",
+            "hideEdge": true,
+            "transitionLabel": "导航到课程"
+          },
+          {
+            "domId": "nav-projects",
+            "targetPageId": "page-projects",
+            "hideEdge": true,
+            "transitionLabel": "导航到作品"
+          },
+          {
+            "domId": "nav-about",
+            "targetPageId": "page-about",
+            "hideEdge": true,
+            "transitionLabel": "导航到关于"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-courses",
+      "title": "教学课程",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1751328000000,
+      "canvasData": {
+        "x": 0,
+        "y": 2987,
+        "group": 1
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/courses.html",
+        "interactions": [
+          {
+            "domId": "nav-index",
+            "targetPageId": "page-index",
+            "hideEdge": true,
+            "transitionLabel": "返回首页"
+          },
+          {
+            "domId": "nav-blog",
+            "targetPageId": "page-blog",
+            "hideEdge": true,
+            "transitionLabel": "导航到博客"
+          },
+          {
+            "domId": "nav-projects",
+            "targetPageId": "page-projects",
+            "hideEdge": true,
+            "transitionLabel": "导航到作品"
+          },
+          {
+            "domId": "nav-about",
+            "targetPageId": "page-about",
+            "hideEdge": true,
+            "transitionLabel": "导航到关于"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-projects",
+      "title": "开源作品",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1751328000000,
+      "canvasData": {
+        "x": 620,
+        "y": 2987,
+        "group": 1
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/projects.html",
+        "interactions": [
+          {
+            "domId": "nav-index",
+            "targetPageId": "page-index",
+            "hideEdge": true,
+            "transitionLabel": "返回首页"
+          },
+          {
+            "domId": "nav-blog",
+            "targetPageId": "page-blog",
+            "hideEdge": true,
+            "transitionLabel": "导航到博客"
+          },
+          {
+            "domId": "nav-courses",
+            "targetPageId": "page-courses",
+            "hideEdge": true,
+            "transitionLabel": "导航到课程"
+          },
+          {
+            "domId": "nav-about",
+            "targetPageId": "page-about",
+            "hideEdge": true,
+            "transitionLabel": "导航到关于"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-about",
+      "title": "关于我",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1751328000000,
+      "canvasData": {
+        "x": 1240,
+        "y": 2987,
+        "group": 1
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/about.html",
+        "interactions": [
+          {
+            "domId": "nav-index",
+            "targetPageId": "page-index",
+            "hideEdge": true,
+            "transitionLabel": "返回首页"
+          },
+          {
+            "domId": "nav-blog",
+            "targetPageId": "page-blog",
+            "hideEdge": true,
+            "transitionLabel": "导航到博客"
+          },
+          {
+            "domId": "nav-courses",
+            "targetPageId": "page-courses",
+            "hideEdge": true,
+            "transitionLabel": "导航到课程"
+          },
+          {
+            "domId": "nav-projects",
+            "targetPageId": "page-projects",
+            "hideEdge": true,
+            "transitionLabel": "导航到作品"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-admin-articles",
+      "title": "文章管理",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1751328000000,
+      "canvasData": {
+        "x": 0,
+        "y": 2465,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/admin-articles.html",
+        "interactions": [
+          {
+            "domId": "btn-new-article",
+            "targetPageId": "page-admin-editor",
+            "transitionLabel": "新建文章"
+          },
+          {
+            "domId": "link-edit-article",
+            "targetPageId": "page-admin-editor",
+            "transitionLabel": "编辑文章"
+          },
+          {
+            "domId": "back-blog-admin",
+            "targetPageId": "page-blog",
+            "hideEdge": true,
+            "transitionLabel": "返回博客"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-admin-editor",
+      "title": "文章编辑器",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1751328000000,
+      "canvasData": {
+        "x": 620,
+        "y": 2465,
+        "group": 2
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/admin-editor.html",
+        "interactions": [
+          {
+            "domId": "back-admin-articles",
+            "targetPageId": "page-admin-articles",
+            "hideEdge": true,
+            "transitionLabel": "返回文章管理"
+          }
+        ]
+      }
+    },
+    {
+      "id": "image-001",
+      "title": "首页主视觉",
+      "type": "image",
+      "version": 1,
+      "createdAt": 1751328000000,
+      "canvasData": {
+        "x": 0,
+        "y": 4137
+      },
+      "devMetadata": {
+        "imageSrc": "assets/hero-banner.jpg"
+      }
+    },
+    {
+      "id": "image-002",
+      "title": "作者头像",
+      "type": "image",
+      "version": 1,
+      "createdAt": 1751328000000,
+      "canvasData": {
+        "x": 620,
+        "y": 4137
+      },
+      "devMetadata": {
+        "imageSrc": "assets/author-avatar.jpg"
+      }
+    },
+    {
+      "id": "image-003",
+      "title": "博客缩略图",
+      "type": "image",
+      "version": 1,
+      "createdAt": 1751328000000,
+      "canvasData": {
+        "x": 1240,
+        "y": 4137
+      },
+      "devMetadata": {
+        "imageSrc": "assets/blog-thumb-systems.jpg"
+      }
+    },
+    {
+      "id": "image-004",
+      "title": "课程插图",
+      "type": "image",
+      "version": 1,
+      "createdAt": 1751328000000,
+      "canvasData": {
+        "x": 1860,
+        "y": 4137
+      },
+      "devMetadata": {
+        "imageSrc": "assets/course-illustration.jpg"
+      }
+    },
+    {
+      "id": "image-005",
+      "title": "开源作品插图",
+      "type": "image",
+      "version": 1,
+      "createdAt": 1751328000000,
+      "canvasData": {
+        "x": 2480,
+        "y": 4137
+      },
+      "devMetadata": {
+        "imageSrc": "assets/projects-illustration.jpg"
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": true,
+    "deviceType": "desktop",
+    "projectName": "码上行 - 个人技术品牌网站"
+  }
+}
