@@ -12,15 +12,6 @@ dist
 dist-ssr
 *.local
 
-# Go backend binaries
-backend/server
-backend/*.exe
-backend/test
-
-# Environment files
-.env
-.env.local
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
